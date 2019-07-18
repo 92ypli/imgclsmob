@@ -192,8 +192,7 @@ class CIFARRiR(nn.Module):
         self.output.add_module('final_conv', conv1x1_block(
             in_channels=in_channels,
             out_channels=num_classes,
-            activation=None,
-            activate=False))
+            activation=None))
         self.output.add_module('final_pool', nn.AvgPool2d(
             kernel_size=8,
             stride=1))
@@ -217,7 +216,7 @@ class CIFARRiR(nn.Module):
 def get_rir_cifar(num_classes,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.torch', 'models'),
+                  root=os.path.join("~", ".torch", "models"),
                   **kwargs):
     """
     Create RiR model for CIFAR with specific parameters.
@@ -319,7 +318,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -341,7 +339,7 @@ def _test():
         assert (model != rir_cifar100 or weight_count == 9527720)
         assert (model != rir_svhn or weight_count == 9492980)
 
-        x = Variable(torch.randn(1, 3, 32, 32))
+        x = torch.randn(1, 3, 32, 32)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, num_classes))

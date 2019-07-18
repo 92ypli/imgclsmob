@@ -58,8 +58,7 @@ class ResDropResUnit(HybridBlock):
                     out_channels=out_channels,
                     strides=strides,
                     bn_use_global_stats=bn_use_global_stats,
-                    activation=None,
-                    activate=False)
+                    activation=None)
             self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
@@ -115,7 +114,7 @@ class CIFARResDropResNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(conv3x3_block(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
@@ -141,7 +140,7 @@ class CIFARResDropResNet(HybridBlock):
                 pool_size=8,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -159,7 +158,7 @@ def get_resdropresnet_cifar(classes,
                             model_name=None,
                             pretrained=False,
                             ctx=cpu(),
-                            root=os.path.join('~', '.mxnet', 'models'),
+                            root=os.path.join("~", ".mxnet", "models"),
                             **kwargs):
     """
     Create ResDrop-ResNet model for CIFAR with specific parameters.

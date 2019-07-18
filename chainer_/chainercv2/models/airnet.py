@@ -1,5 +1,5 @@
 """
-    AirNet, implemented in Chainer.
+    AirNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'Attention Inspiring Receptive-Fields Network for Learning Invariant Representations,'
     https://ieeexplore.ieee.org/document/8510896.
 """
@@ -56,7 +56,7 @@ class AirBlock(Chain):
             self.conv3 = conv1x1_block(
                 in_channels=mid_channels,
                 out_channels=out_channels,
-                activate=False)
+                activation=None)
 
     def __call__(self, x):
         input_shape = x.shape
@@ -104,7 +104,7 @@ class AirBottleneck(Chain):
             self.conv3 = conv1x1_block(
                 in_channels=mid_channels,
                 out_channels=out_channels,
-                activate=False)
+                activation=None)
             if self.use_air_block:
                 self.air = AirBlock(
                     in_channels=in_channels,
@@ -156,7 +156,7 @@ class AirUnit(Chain):
                     in_channels=in_channels,
                     out_channels=out_channels,
                     stride=stride,
-                    activate=False)
+                    activation=None)
             self.activ = F.relu
 
     def __call__(self, x):
@@ -288,7 +288,7 @@ def get_airnet(blocks,
                ratio,
                model_name=None,
                pretrained=False,
-               root=os.path.join('~', '.chainer', 'models'),
+               root=os.path.join("~", ".chainer", "models"),
                **kwargs):
     """
     Create AirNet model with specific parameters.

@@ -1,5 +1,5 @@
 """
-    RevNet, implemented in PyTorch.
+    RevNet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'The Reversible Residual Network: Backpropagation Without Storing Activations,'
     https://arxiv.org/abs/1707.04585.
 """
@@ -283,8 +283,7 @@ class RevUnit(nn.Module):
                 in_channels=in_channels,
                 out_channels=out_channels,
                 stride=stride,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def forward(self, x):
         if self.resize_identity:
@@ -394,7 +393,7 @@ class RevNet(nn.Module):
 def get_revnet(blocks,
                model_name=None,
                pretrained=False,
-               root=os.path.join('~', '.torch', 'models'),
+               root=os.path.join("~", ".torch", "models"),
                **kwargs):
     """
     Create RevNet model with specific parameters.

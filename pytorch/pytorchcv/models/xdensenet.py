@@ -1,5 +1,5 @@
 """
-    X-DenseNet, implemented in PyTorch.
+    X-DenseNet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'Deep Expander Networks: Efficient Deep Networks from Graph Theory,'
     https://arxiv.org/abs/1711.08757.
 """
@@ -234,7 +234,7 @@ class XDenseUnit(nn.Module):
         Number of input channels.
     out_channels : int
         Number of output channels.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     expand_ratio : int
         Ratio of expansion.
@@ -354,7 +354,7 @@ def get_xdensenet(blocks,
                   expand_ratio=2,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.torch', 'models'),
+                  root=os.path.join("~", ".torch", "models"),
                   **kwargs):
     """
     Create X-DenseNet model with specific parameters.
@@ -490,7 +490,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -514,7 +513,7 @@ def _test():
         assert (model != xdensenet169_2 or weight_count == 14149480)
         assert (model != xdensenet201_2 or weight_count == 20013928)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

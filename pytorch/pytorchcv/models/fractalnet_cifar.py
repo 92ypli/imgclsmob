@@ -31,7 +31,7 @@ class DropConvBlock(nn.Module):
         Padding value for convolution layer.
     bias : bool, default False
         Whether the layer uses a bias vector.
-    dropout_rate : bool, default 0.0
+    dropout_rate : float, default 0.0
         Parameter of Dropout layer. Faction of the input units to drop.
     """
     def __init__(self,
@@ -87,7 +87,7 @@ def drop_conv3x3_block(in_channels,
         Padding value for convolution layer.
     bias : bool, default False
         Whether the layer uses a bias vector.
-    dropout_rate : bool, default 0.0
+    dropout_rate : float, default 0.0
         Parameter of Dropout layer. Faction of the input units to drop.
     """
     return DropConvBlock(
@@ -379,7 +379,7 @@ class CIFARFractalNet(nn.Module):
 def get_fractalnet_cifar(num_classes,
                          model_name=None,
                          pretrained=False,
-                         root=os.path.join('~', '.torch', 'models'),
+                         root=os.path.join("~", ".torch", "models"),
                          **kwargs):
     """
     Create WRN model for CIFAR with specific parameters.
@@ -468,7 +468,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -488,7 +487,7 @@ def _test():
         assert (model != fractalnet_cifar10 or weight_count == 33724618)
         assert (model != fractalnet_cifar100 or weight_count == 33770788)
 
-        x = Variable(torch.randn(1, 3, 32, 32))
+        x = torch.randn(1, 3, 32, 32)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, num_classes))

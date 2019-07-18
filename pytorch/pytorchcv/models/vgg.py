@@ -1,11 +1,11 @@
 """
-    VGG, implemented in PyTorch.
+    VGG for ImageNet-1K, implemented in PyTorch.
     Original paper: 'Very Deep Convolutional Networks for Large-Scale Image Recognition,'
     https://arxiv.org/abs/1409.1556.
 """
 
 __all__ = ['VGG', 'vgg11', 'vgg13', 'vgg16', 'vgg19', 'bn_vgg11', 'bn_vgg13', 'bn_vgg16', 'bn_vgg19', 'bn_vgg11b',
-           'bn_vgg13b', 'bn_vgg16b', 'bn_vgg19b']
+           'bn_vgg13b', 'bn_vgg16b', 'bn_vgg19b', 'vgg_conv3x3']
 
 import os
 import torch.nn as nn
@@ -227,7 +227,7 @@ def get_vgg(blocks,
             use_bn=False,
             model_name=None,
             pretrained=False,
-            root=os.path.join('~', '.torch', 'models'),
+            root=os.path.join("~", ".torch", "models"),
             **kwargs):
     """
     Create VGG model with specific parameters.
@@ -470,7 +470,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -510,7 +509,7 @@ def _test():
         assert (model != bn_vgg16b or weight_count == 138365992)
         assert (model != bn_vgg19b or weight_count == 143678248)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

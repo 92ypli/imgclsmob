@@ -1,5 +1,5 @@
 """
-    DLA, implemented in PyTorch.
+    DLA for ImageNet-1K, implemented in PyTorch.
     Original paper: 'Deep Layer Aggregation,' https://arxiv.org/abs/1707.06484.
 """
 
@@ -113,8 +113,7 @@ class DLAResBlock(nn.Module):
             self.project_conv = conv1x1_block(
                 in_channels=in_channels,
                 out_channels=out_channels,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def forward(self, x):
         down = self.downsample_pool(x) if self.downsample else x
@@ -153,8 +152,7 @@ class DLARoot(nn.Module):
         self.conv = conv1x1_block(
             in_channels=in_channels,
             out_channels=out_channels,
-            activation=None,
-            activate=False)
+            activation=None)
         self.activ = nn.ReLU(inplace=True)
 
     def forward(self, x2, x1, extra):
@@ -394,7 +392,7 @@ def get_dla(levels,
             residual_root=False,
             model_name=None,
             pretrained=False,
-            root=os.path.join('~', '.torch', 'models'),
+            root=os.path.join("~", ".torch", "models"),
             **kwargs):
     """
     Create DLA model with specific parameters.
@@ -603,7 +601,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -639,7 +636,7 @@ def _test():
         assert (model != dla102x2 or weight_count == 41282200)
         assert (model != dla169 or weight_count == 53389720)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

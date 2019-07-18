@@ -1,5 +1,5 @@
 """
-    PolyNet, implemented in PyTorch.
+    PolyNet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'PolyNet: A Pursuit of Structural Diversity in Very Deep Networks,'
     https://arxiv.org/abs/1611.05725.
 """
@@ -270,7 +270,7 @@ class TwoWayABlock(nn.Module):
         self.conv = conv1x1_block(
             in_channels=128,
             out_channels=in_channels,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         x = self.branches(x)
@@ -299,7 +299,7 @@ class TwoWayBBlock(nn.Module):
         self.conv = conv1x1_block(
             in_channels=384,
             out_channels=in_channels,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         x = self.branches(x)
@@ -328,7 +328,7 @@ class TwoWayCBlock(nn.Module):
         self.conv = conv1x1_block(
             in_channels=448,
             out_channels=in_channels,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         x = self.branches(x)
@@ -416,7 +416,7 @@ def poly_res_b_block():
         in_channels=384,
         out_channels=1152,
         stride=1,
-        activate=False)
+        activation=None)
 
 
 def poly_res_c_block():
@@ -427,7 +427,7 @@ def poly_res_c_block():
         in_channels=448,
         out_channels=2048,
         stride=1,
-        activate=False)
+        activation=None)
 
 
 class MultiResidual(nn.Module):
@@ -851,7 +851,7 @@ class PolyNet(nn.Module):
 
 def get_polynet(model_name=None,
                 pretrained=False,
-                root=os.path.join('~', '.torch', 'models'),
+                root=os.path.join("~", ".torch", "models"),
                 **kwargs):
     """
     Create PolyNet model with specific parameters.
@@ -917,7 +917,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -935,7 +934,7 @@ def _test():
         print("m={}, {}".format(model.__name__, weight_count))
         assert (model != polynet or weight_count == 95366600)
 
-        x = Variable(torch.randn(1, 3, 331, 331))
+        x = torch.randn(1, 3, 331, 331)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

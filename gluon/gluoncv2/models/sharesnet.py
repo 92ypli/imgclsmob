@@ -1,5 +1,5 @@
 """
-    ShaResNet, implemented in Gluon.
+    ShaResNet for ImageNet-1K, implemented in Gluon.
     Original paper: 'ShaResNet: reducing residual network parameter number by sharing weights,'
     https://arxiv.org/abs/1702.08782.
 """
@@ -250,8 +250,7 @@ class ShaResBottleneck(HybridBlock):
                 in_channels=mid_channels,
                 out_channels=out_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def hybrid_forward(self, F, x):
         x = self.conv1(x)
@@ -315,7 +314,7 @@ class ShaResUnit(HybridBlock):
                     out_channels=out_channels,
                     strides=strides,
                     bn_use_global_stats=bn_use_global_stats,
-                    activate=False)
+                    activation=None)
             self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
@@ -369,7 +368,7 @@ class ShaResNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(ResInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
@@ -398,7 +397,7 @@ class ShaResNet(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -415,7 +414,7 @@ def get_sharesnet(blocks,
                   model_name=None,
                   pretrained=False,
                   ctx=cpu(),
-                  root=os.path.join('~', '.mxnet', 'models'),
+                  root=os.path.join("~", ".mxnet", "models"),
                   **kwargs):
     """
     Create ShaResNet model with specific parameters.

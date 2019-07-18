@@ -1,5 +1,5 @@
 """
-    SqueezeNext, implemented in TensorFlow.
+    SqueezeNext for ImageNet-1K, implemented in TensorFlow.
     Original paper: 'SqueezeNext: Hardware-Aware Neural Network Design,' https://arxiv.org/abs/1803.10615.
 """
 
@@ -277,7 +277,7 @@ def get_squeezenext(version,
                     width_scale,
                     model_name=None,
                     pretrained=False,
-                    root=os.path.join('~', '.tensorflow', 'models'),
+                    root=os.path.join("~", ".tensorflow", "models"),
                     **kwargs):
     """
     Create SqueezeNext model with specific parameters.

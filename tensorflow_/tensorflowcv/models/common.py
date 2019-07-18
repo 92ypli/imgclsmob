@@ -4,12 +4,45 @@
 
 __all__ = ['is_channels_first', 'get_channel_axis', 'flatten', 'batchnorm', 'maxpool2d', 'avgpool2d', 'conv2d',
            'conv1x1', 'conv3x3', 'depthwise_conv3x3', 'conv_block', 'conv1x1_block', 'conv3x3_block', 'conv7x7_block',
-           'dwconv3x3_block', 'pre_conv_block', 'pre_conv1x1_block', 'pre_conv3x3_block', 'se_block', 'channel_shuffle',
-           'channel_shuffle2']
+           'dwconv3x3_block', 'dwconv5x5_block', 'pre_conv_block', 'pre_conv1x1_block', 'pre_conv3x3_block', 'se_block',
+           'channel_shuffle', 'channel_shuffle2']
 
 import math
 import numpy as np
 import tensorflow as tf
+
+
+def get_activation_layer(x,
+                         activation,
+                         name="activ"):
+    """
+    Create activation layer from string/function.
+
+    Parameters:
+    ----------
+    x : Tensor
+        Input tensor.
+    activation : function or str
+        Activation function or name of activation function.
+    name : str, default 'activ'
+        Block name.
+
+    Returns
+    -------
+    Tensor
+        Resulted tensor.
+    """
+    assert (activation is not None)
+    if isinstance(activation, str):
+        if activation == "relu":
+            x = tf.nn.relu(x, name=name)
+        elif activation == "relu6":
+            x = tf.nn.relu6(x, name=name)
+        else:
+            raise NotImplementedError()
+    else:
+        x = activation(x)
+    return x
 
 
 def is_channels_first(data_format):
@@ -510,12 +543,11 @@ def conv_block(x,
                groups=1,
                use_bias=False,
                activation="relu",
-               activate=True,
                training=False,
                data_format="channels_last",
                name="conv_block"):
     """
-    Standard convolution block with Batch normalization and ReLU/ReLU6 activation.
+    Standard convolution block with Batch normalization and activation.
 
     Parameters:
     ----------
@@ -539,8 +571,6 @@ def conv_block(x,
         Whether the layer uses a bias vector.
     activation : function or str or None, default 'relu'
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     training : bool, or a TensorFlow boolean scalar tensor, default False
       Whether to return the output in training mode or in inference mode.
     data_format : str, default 'channels_last'
@@ -570,17 +600,11 @@ def conv_block(x,
         training=training,
         data_format=data_format,
         name=name + "/bn")
-    if activate:
-        assert (activation is not None)
-        if isinstance(activation, str):
-            if activation == "relu":
-                x = tf.nn.relu(x, name=name + "/activ")
-            elif activation == "relu6":
-                x = tf.nn.relu6(x, name=name + "/activ")
-            else:
-                raise NotImplementedError()
-        else:
-            x = activation(x)
+    if activation is not None:
+        x = get_activation_layer(
+            x=x,
+            activation=activation,
+            name=name + "/activ")
     return x
 
 
@@ -591,7 +615,6 @@ def conv1x1_block(x,
                   groups=1,
                   use_bias=False,
                   activation="relu",
-                  activate=True,
                   training=False,
                   data_format="channels_last",
                   name="conv1x1_block"):
@@ -614,8 +637,6 @@ def conv1x1_block(x,
         Whether the layer uses a bias vector.
     activation : function or str or None, default 'relu'
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     training : bool, or a TensorFlow boolean scalar tensor, default False
       Whether to return the output in training mode or in inference mode.
     data_format : str, default 'channels_last'
@@ -638,7 +659,6 @@ def conv1x1_block(x,
         groups=groups,
         use_bias=use_bias,
         activation=activation,
-        activate=activate,
         training=training,
         data_format=data_format,
         name=name)
@@ -653,7 +673,6 @@ def conv3x3_block(x,
                   groups=1,
                   use_bias=False,
                   activation="relu",
-                  activate=True,
                   training=False,
                   data_format="channels_last",
                   name="conv3x3_block"):
@@ -680,8 +699,6 @@ def conv3x3_block(x,
         Whether the layer uses a bias vector.
     activation : function or str or None, default 'relu'
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     training : bool, or a TensorFlow boolean scalar tensor, default False
       Whether to return the output in training mode or in inference mode.
     data_format : str, default 'channels_last'
@@ -705,7 +722,69 @@ def conv3x3_block(x,
         groups=groups,
         use_bias=use_bias,
         activation=activation,
-        activate=activate,
+        training=training,
+        data_format=data_format,
+        name=name)
+
+
+def conv5x5_block(x,
+                  in_channels,
+                  out_channels,
+                  strides=1,
+                  padding=2,
+                  dilation=1,
+                  groups=1,
+                  use_bias=False,
+                  activation="relu",
+                  training=False,
+                  data_format="channels_last",
+                  name="conv3x3_block"):
+    """
+    5x5 version of the standard convolution block.
+
+    Parameters:
+    ----------
+    x : Tensor
+        Input tensor.
+    in_channels : int
+        Number of input channels.
+    out_channels : int
+        Number of output channels.
+    strides : int or tuple/list of 2 int, default 1
+        Strides of the convolution.
+    padding : int or tuple/list of 2 int, default 2
+        Padding value for convolution layer.
+    dilation : int or tuple/list of 2 int, default 1
+        Dilation value for convolution layer.
+    groups : int, default 1
+        Number of groups.
+    use_bias : bool, default False
+        Whether the layer uses a bias vector.
+    activation : function or str or None, default 'relu'
+        Activation function or name of activation function.
+    training : bool, or a TensorFlow boolean scalar tensor, default False
+      Whether to return the output in training mode or in inference mode.
+    data_format : str, default 'channels_last'
+        The ordering of the dimensions in tensors.
+    name : str, default 'conv3x3_block'
+        Block name.
+
+    Returns
+    -------
+    Tensor
+        Resulted tensor.
+    """
+    return conv_block(
+        x=x,
+        in_channels=in_channels,
+        out_channels=out_channels,
+        kernel_size=5,
+        strides=strides,
+        padding=padding,
+        dilation=dilation,
+        groups=groups,
+        use_bias=use_bias,
+        activation=activation,
         training=training,
         data_format=data_format,
         name=name)
@@ -718,7 +797,6 @@ def conv7x7_block(x,
                   padding=3,
                   use_bias=False,
                   activation="relu",
-                  activate=True,
                   training=False,
                   data_format="channels_last",
                   name="conv7x7_block"):
@@ -741,8 +819,6 @@ def conv7x7_block(x,
         Whether the layer uses a bias vector.
     activation : function or str or None, default 'relu'
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     training : bool, or a TensorFlow boolean scalar tensor, default False
       Whether to return the output in training mode or in inference mode.
     data_format : str, default 'channels_last'
@@ -764,7 +840,6 @@ def conv7x7_block(x,
         padding=padding,
         use_bias=use_bias,
         activation=activation,
-        activate=activate,
         training=training,
         data_format=data_format,
         name=name)
@@ -773,17 +848,16 @@ def conv7x7_block(x,
 def dwconv3x3_block(x,
                     in_channels,
                     out_channels,
-                    strides,
+                    strides=1,
                     padding=1,
                     dilation=1,
                     use_bias=False,
                     activation="relu",
-                    activate=True,
                     training=False,
                     data_format="channels_last",
                     name="dwconv3x3_block"):
     """
-    3x3 depthwise version of the standard convolution block with ReLU6 activation.
+    3x3 depthwise version of the standard convolution block.
 
     Parameters:
     ----------
@@ -793,7 +867,7 @@ def dwconv3x3_block(x,
         Number of input channels.
     out_channels : int
         Number of output channels.
-    strides : int or tuple/list of 2 int
+    strides : int or tuple/list of 2 int, default 1
         Strides of the convolution.
     padding : int or tuple/list of 2 int, default 1
         Padding value for convolution layer.
@@ -803,8 +877,6 @@ def dwconv3x3_block(x,
         Whether the layer uses a bias vector.
     activation : function or str or None, default 'relu'
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     training : bool, or a TensorFlow boolean scalar tensor, default False
       Whether to return the output in training mode or in inference mode.
     data_format : str, default 'channels_last'
@@ -827,7 +899,65 @@ def dwconv3x3_block(x,
         groups=out_channels,
         use_bias=use_bias,
         activation=activation,
-        activate=activate,
+        training=training,
+        data_format=data_format,
+        name=name)
+
+
+def dwconv5x5_block(x,
+                    in_channels,
+                    out_channels,
+                    strides=1,
+                    padding=2,
+                    dilation=1,
+                    use_bias=False,
+                    activation="relu",
+                    training=False,
+                    data_format="channels_last",
+                    name="dwconv3x3_block"):
+    """
+    5x5 depthwise version of the standard convolution block.
+
+    Parameters:
+    ----------
+    x : Tensor
+        Input tensor.
+    in_channels : int
+        Number of input channels.
+    out_channels : int
+        Number of output channels.
+    strides : int or tuple/list of 2 int, default 1
+        Strides of the convolution.
+    padding : int or tuple/list of 2 int, default 2
+        Padding value for convolution layer.
+    dilation : int or tuple/list of 2 int, default 1
+        Dilation value for convolution layer.
+    use_bias : bool, default False
+        Whether the layer uses a bias vector.
+    activation : function or str or None, default 'relu'
+        Activation function or name of activation function.
+    training : bool, or a TensorFlow boolean scalar tensor, default False
+      Whether to return the output in training mode or in inference mode.
+    data_format : str, default 'channels_last'
+        The ordering of the dimensions in tensors.
+    name : str, default 'dwconv3x3_block'
+        Block name.
+
+    Returns
+    -------
+    Tensor
+        Resulted tensor.
+    """
+    return conv5x5_block(
+        x=x,
+        in_channels=in_channels,
+        out_channels=out_channels,
+        strides=strides,
+        padding=padding,
+        dilation=dilation,
+        groups=out_channels,
+        use_bias=use_bias,
+        activation=activation,
         training=training,
         data_format=data_format,
         name=name)
@@ -1088,6 +1218,7 @@ def channel_shuffle2(x,
 def se_block(x,
              channels,
              reduction=16,
+             activation="relu",
              data_format="channels_last",
              name="se_block"):
     """
@@ -1101,6 +1232,8 @@ def se_block(x,
         Number of channels.
     reduction : int, default 16
         Squeeze reduction value.
+    activation : function or str, default 'relu'
+        Activation function or name of activation function.
     data_format : str, default 'channels_last'
         The ordering of the dimensions in tensors.
     name : str, default 'se_block'
@@ -1128,7 +1261,10 @@ def se_block(x,
         use_bias=True,
         data_format=data_format,
         name=name + "/conv1/conv")
-    w = tf.nn.relu(w, name=name + "/relu")
+    w = get_activation_layer(
+        x=w,
+        activation=activation,
+        name=name + "/activ")
     w = conv1x1(
         x=w,
         in_channels=mid_cannels,

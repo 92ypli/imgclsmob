@@ -1,10 +1,11 @@
 """
-    ProxylessNAS, implemented in Chainer.
+    ProxylessNAS for ImageNet-1K, implemented in Chainer.
     Original paper: 'ProxylessNAS: Direct Neural Architecture Search on Target Task and Hardware,'
     https://arxiv.org/abs/1812.00332.
 """
 
-__all__ = ['ProxylessNAS', 'proxylessnas_cpu', 'proxylessnas_gpu', 'proxylessnas_mobile', 'proxylessnas_mobile14']
+__all__ = ['ProxylessNAS', 'proxylessnas_cpu', 'proxylessnas_gpu', 'proxylessnas_mobile', 'proxylessnas_mobile14',
+           'get_proxylessnas']
 
 import os
 import chainer.functions as F
@@ -67,8 +68,7 @@ class ProxylessBlock(Chain):
                 in_channels=mid_channels,
                 out_channels=out_channels,
                 bn_eps=bn_eps,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def __call__(self, x):
         if self.use_bc:
@@ -245,7 +245,7 @@ class ProxylessNAS(Chain):
 def get_proxylessnas(version,
                      model_name=None,
                      pretrained=False,
-                     root=os.path.join('~', '.chainer', 'models'),
+                     root=os.path.join("~", ".chainer", "models"),
                      **kwargs):
     """
     Create ProxylessNAS model with specific parameters.

@@ -1,5 +1,5 @@
 """
-    DARTS, implemented in Chainer.
+    DARTS for ImageNet-1K, implemented in Chainer.
     Original paper: 'DARTS: Differentiable Architecture Search,' https://arxiv.org/abs/1806.09055.
 """
 
@@ -635,7 +635,7 @@ class DARTS(Chain):
 
 def get_darts(model_name=None,
               pretrained=False,
-              root=os.path.join('~', '.chainer', 'models'),
+              root=os.path.join("~", ".chainer", "models"),
               **kwargs):
     """
     Create DARTS model with specific parameters.

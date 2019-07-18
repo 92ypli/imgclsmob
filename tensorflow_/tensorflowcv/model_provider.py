@@ -53,6 +53,7 @@ _models = {
     'resnet26': resnet26,
     'resnetbc26b': resnetbc26b,
     'resnet34': resnet34,
+    'resnetbc38b': resnetbc38b,
     'resnet50': resnet50,
     'resnet50b': resnet50b,
     'resnet101': resnet101,
@@ -85,12 +86,26 @@ _models = {
     'preresnet200b': preresnet200b,
     'preresnet269b': preresnet269b,
 
+    'resnext14_16x4d': resnext14_16x4d,
+    'resnext14_32x2d': resnext14_32x2d,
+    'resnext14_32x4d': resnext14_32x4d,
+    'resnext26_16x4d': resnext26_16x4d,
+    'resnext26_32x2d': resnext26_32x2d,
+    'resnext26_32x4d': resnext26_32x4d,
+    'resnext38_32x4d': resnext38_32x4d,
     'resnext50_32x4d': resnext50_32x4d,
     'resnext101_32x4d': resnext101_32x4d,
     'resnext101_64x4d': resnext101_64x4d,
 
+    'seresnet10': seresnet10,
+    'seresnet12': seresnet12,
+    'seresnet14': seresnet14,
+    'seresnet16': seresnet16,
     'seresnet18': seresnet18,
+    'seresnet26': seresnet26,
+    'seresnetbc26b': seresnetbc26b,
     'seresnet34': seresnet34,
+    'seresnetbc38b': seresnetbc38b,
     'seresnet50': seresnet50,
     'seresnet50b': seresnet50b,
     'seresnet101': seresnet101,
@@ -115,6 +130,9 @@ _models = {
     'seresnext101_32x4d': seresnext101_32x4d,
     'seresnext101_64x4d': seresnext101_64x4d,
 
+    'senet16': senet16,
+    'senet28': senet28,
+    'senet40': senet40,
     'senet52': senet52,
     'senet103': senet103,
     'senet154': senet154,
@@ -215,7 +233,7 @@ def get_model(name, **kwargs):
     """
     name = name.lower()
     if name not in _models:
-        raise ValueError('Unsupported model: {}'.format(name))
+        raise ValueError("Unsupported model: {}".format(name))
     net = _models[name](**kwargs)
     return net
 

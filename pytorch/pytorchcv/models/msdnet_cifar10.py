@@ -167,7 +167,7 @@ class CIFAR10MSDNet(nn.Module):
 def get_msdnet_cifar10(blocks,
                        model_name=None,
                        pretrained=False,
-                       root=os.path.join('~', '.torch', 'models'),
+                       root=os.path.join("~", ".torch", "models"),
                        **kwargs):
     """
     Create MSDNet model for CIFAR-10 with specific parameters.
@@ -293,7 +293,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -311,7 +310,7 @@ def _test():
         print("m={}, {}".format(model.__name__, weight_count))
         assert (model != msdnet22_cifar10 or weight_count == 4839544)  # 5440864
 
-        x = Variable(torch.randn(1, 3, 32, 32))
+        x = torch.randn(1, 3, 32, 32)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 10))

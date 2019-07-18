@@ -1,5 +1,5 @@
 """
-    ESPNetv2, implemented in Gluon.
+    ESPNetv2 for ImageNet-1K, implemented in Gluon.
     Original paper: 'ESPNetv2: A Light-weight, Power Efficient, and General Purpose Convolutional Neural Network,'
     https://arxiv.org/abs/1811.11431.
 """
@@ -70,8 +70,7 @@ class ShortcutBlock(HybridBlock):
                 in_channels=in_channels,
                 out_channels=out_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def hybrid_forward(self, F, x):
         x = self.conv1(x)
@@ -145,7 +144,7 @@ class ESPBlock(HybridBlock):
                 bn_use_global_stats=bn_use_global_stats,
                 activation=(lambda: PReLU2(mid_channels)))
 
-            self.branches = HierarchicalConcurrent(axis=1, prefix='')
+            self.branches = HierarchicalConcurrent(axis=1, prefix="")
             for i in range(num_branches):
                 self.branches.add(conv3x3(
                     in_channels=mid_channels,
@@ -160,8 +159,7 @@ class ESPBlock(HybridBlock):
                 out_channels=out_channels,
                 groups=num_branches,
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False)
+                activation=None)
             self.preactiv = PreActivation(in_channels=out_channels)
             if not self.downsample:
                 self.activ = PReLU2(out_channels)
@@ -361,14 +359,14 @@ class ESPNetv2(HybridBlock):
                 return_two=False,
                 first_ordinals=0,
                 last_ordinals=2,
-                prefix='')
+                prefix="")
             self.features.add(ESPInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
                 bn_use_global_stats=bn_use_global_stats))
             in_channels = init_block_channels
             for i, channels_per_stage in enumerate(channels):
-                stage = DualPathSequential(prefix='stage{}_'.format(i + 1))
+                stage = DualPathSequential(prefix="stage{}_".format(i + 1))
                 for j, out_channels in enumerate(channels_per_stage):
                     if j == 0:
                         unit = DownsampleBlock(
@@ -397,7 +395,7 @@ class ESPNetv2(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dropout(rate=dropout_rate))
             self.output.add(nn.Dense(
@@ -414,7 +412,7 @@ def get_espnetv2(width_scale,
                  model_name=None,
                  pretrained=False,
                  ctx=cpu(),
-                 root=os.path.join('~', '.mxnet', 'models'),
+                 root=os.path.join("~", ".mxnet", "models"),
                  **kwargs):
     """
     Create ESPNetv2 model with specific parameters.

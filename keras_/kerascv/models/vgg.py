@@ -1,5 +1,5 @@
 """
-    VGG, implemented in Keras.
+    VGG for ImageNet-1K, implemented in Keras.
     Original paper: 'Very Deep Convolutional Networks for Large-Scale Image Recognition,'
     https://arxiv.org/abs/1409.1556.
 """
@@ -210,7 +210,8 @@ def vgg(channels,
     classes : int, default 1000
         Number of classification classes.
     """
-    input_shape = (in_channels, 224, 224) if is_channels_first() else (224, 224, in_channels)
+    input_shape = (in_channels, in_size[0], in_size[1]) if is_channels_first() else\
+        (in_size[0], in_size[1], in_channels)
     input = nn.Input(shape=input_shape)
 
     x = input
@@ -248,7 +249,7 @@ def get_vgg(blocks,
             use_bn=False,
             model_name=None,
             pretrained=False,
-            root=os.path.join('~', '.keras', 'models'),
+            root=os.path.join("~", ".keras", "models"),
             **kwargs):
     """
     Create VGG model with specific parameters.

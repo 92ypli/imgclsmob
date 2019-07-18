@@ -1,5 +1,5 @@
 """
-    PolyNet, implemented in Gluon.
+    PolyNet for ImageNet-1K, implemented in Gluon.
     Original paper: 'PolyNet: A Pursuit of Structural Diversity in Very Deep Networks,'
     https://arxiv.org/abs/1611.05725.
 """
@@ -59,7 +59,7 @@ class PolyConv(HybridBlock):
                 setattr(self, "bn{}".format(i + 1), nn.BatchNorm(
                     in_channels=out_channels,
                     use_global_stats=bn_use_global_stats))
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x, index):
         x = self.conv(x)
@@ -210,7 +210,7 @@ class ConvSeqBranch(HybridBlock):
         assert (len(out_channels_list) == len(padding_list))
 
         with self.name_scope():
-            self.conv_list = nn.HybridSequential(prefix='')
+            self.conv_list = nn.HybridSequential(prefix="")
             for i, (out_channels, kernel_size, strides, padding) in enumerate(zip(
                     out_channels_list, kernel_size_list, strides_list, padding_list)):
                 self.conv_list.add(ConvBlock(
@@ -263,7 +263,7 @@ class PolyConvSeqBranch(HybridBlock):
         assert (len(out_channels_list) == len(padding_list))
 
         with self.name_scope():
-            self.conv_list = ParametricSequential(prefix='')
+            self.conv_list = ParametricSequential(prefix="")
             for i, (out_channels, kernel_size, strides, padding) in enumerate(zip(
                     out_channels_list, kernel_size_list, strides_list, padding_list)):
                 self.conv_list.add(PolyConv(
@@ -297,7 +297,7 @@ class TwoWayABlock(HybridBlock):
         in_channels = 384
 
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(ConvSeqBranch(
                 in_channels=in_channels,
                 out_channels_list=(32, 48, 64),
@@ -320,7 +320,7 @@ class TwoWayABlock(HybridBlock):
                 in_channels=128,
                 out_channels=in_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activate=False)
+                activation=None)
 
     def hybrid_forward(self, F, x):
         x = self.branches(x)
@@ -344,7 +344,7 @@ class TwoWayBBlock(HybridBlock):
         in_channels = 1152
 
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(ConvSeqBranch(
                 in_channels=in_channels,
                 out_channels_list=(128, 160, 192),
@@ -360,7 +360,7 @@ class TwoWayBBlock(HybridBlock):
                 in_channels=384,
                 out_channels=in_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activate=False)
+                activation=None)
 
     def hybrid_forward(self, F, x):
         x = self.branches(x)
@@ -384,7 +384,7 @@ class TwoWayCBlock(HybridBlock):
         in_channels = 2048
 
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(ConvSeqBranch(
                 in_channels=in_channels,
                 out_channels_list=(192, 224, 256),
@@ -400,7 +400,7 @@ class TwoWayCBlock(HybridBlock):
                 in_channels=448,
                 out_channels=in_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activate=False)
+                activation=None)
 
     def hybrid_forward(self, F, x):
         x = self.branches(x)
@@ -431,7 +431,7 @@ class PolyPreBBlock(HybridBlock):
         in_channels = 1152
 
         with self.name_scope():
-            self.branches = ParametricConcurrent(axis=1, prefix='')
+            self.branches = ParametricConcurrent(axis=1, prefix="")
             self.branches.add(PolyConvSeqBranch(
                 in_channels=in_channels,
                 out_channels_list=(128, 160, 192),
@@ -474,7 +474,7 @@ class PolyPreCBlock(HybridBlock):
         in_channels = 2048
 
         with self.name_scope():
-            self.branches = ParametricConcurrent(axis=1, prefix='')
+            self.branches = ParametricConcurrent(axis=1, prefix="")
             self.branches.add(PolyConvSeqBranch(
                 in_channels=in_channels,
                 out_channels_list=(192, 224, 256),
@@ -508,7 +508,7 @@ def poly_res_b_block(bn_use_global_stats):
         out_channels=1152,
         strides=1,
         bn_use_global_stats=bn_use_global_stats,
-        activate=False)
+        activation=None)
 
 
 def poly_res_c_block(bn_use_global_stats):
@@ -525,7 +525,7 @@ def poly_res_c_block(bn_use_global_stats):
         out_channels=2048,
         strides=1,
         bn_use_global_stats=bn_use_global_stats,
-        activate=False)
+        activation=None)
 
 
 class MultiResidual(HybridBlock):
@@ -557,7 +557,7 @@ class MultiResidual(HybridBlock):
         with self.name_scope():
             for i in range(num_blocks):
                 setattr(self, "res_block{}".format(i + 1), res_block(bn_use_global_stats=bn_use_global_stats))
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
         out = x
@@ -603,7 +603,7 @@ class PolyResidual(HybridBlock):
                 num_blocks=num_blocks)
             for i in range(num_blocks):
                 setattr(self, "res_block{}".format(i + 1), res_block(bn_use_global_stats=bn_use_global_stats))
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
         out = x
@@ -771,7 +771,7 @@ class ReductionAUnit(HybridBlock):
         in_channels = 384
 
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(ConvSeqBranch(
                 in_channels=in_channels,
                 out_channels_list=(256, 256, 384),
@@ -809,7 +809,7 @@ class ReductionBUnit(HybridBlock):
         in_channels = 1152
 
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(ConvSeqBranch(
                 in_channels=in_channels,
                 out_channels_list=(256, 256, 256),
@@ -852,7 +852,7 @@ class PolyBlock3a(HybridBlock):
                  **kwargs):
         super(PolyBlock3a, self).__init__(**kwargs)
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(MaxPoolBranch())
             self.branches.add(Conv3x3Branch(
                 in_channels=64,
@@ -878,7 +878,7 @@ class PolyBlock4a(HybridBlock):
                  **kwargs):
         super(PolyBlock4a, self).__init__(**kwargs)
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(ConvSeqBranch(
                 in_channels=160,
                 out_channels_list=(64, 96),
@@ -913,7 +913,7 @@ class PolyBlock5a(HybridBlock):
                  **kwargs):
         super(PolyBlock5a, self).__init__(**kwargs)
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(MaxPoolBranch())
             self.branches.add(Conv3x3Branch(
                 in_channels=192,
@@ -1009,13 +1009,13 @@ class PolyNet(HybridBlock):
         reduction_units = [ReductionAUnit, ReductionBUnit]
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(PolyInitBlock(
                 in_channels=in_channels,
                 bn_use_global_stats=bn_use_global_stats))
 
             for i, (two_way_scales_per_stage, poly_scales_per_stage) in enumerate(zip(two_way_scales, poly_scales)):
-                stage = nn.HybridSequential(prefix='stage{}_'.format(i + 1))
+                stage = nn.HybridSequential(prefix="stage{}_".format(i + 1))
                 with stage.name_scope():
                     for j, (two_way_scale, poly_scale) in enumerate(zip(two_way_scales_per_stage, poly_scales_per_stage)):
                         if (j == 0) and (i != 0):
@@ -1033,7 +1033,7 @@ class PolyNet(HybridBlock):
                 pool_size=9,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dropout(rate=dropout_rate))
             self.output.add(nn.Dense(
@@ -1049,7 +1049,7 @@ class PolyNet(HybridBlock):
 def get_polynet(model_name=None,
                 pretrained=False,
                 ctx=cpu(),
-                root=os.path.join('~', '.mxnet', 'models'),
+                root=os.path.join("~", ".mxnet", "models"),
                 **kwargs):
     """
     Create PolyNet model with specific parameters.

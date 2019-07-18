@@ -1,5 +1,5 @@
 """
-    BagNet, implemented in Chainer.
+    BagNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'Approximating CNNs with Bag-of-local-Features models works surprisingly well on ImageNet,'
     https://openreview.net/pdf?id=SkfMWhAqYQ.
 """
@@ -54,8 +54,7 @@ class BagNetBottleneck(Chain):
             self.conv3 = conv1x1_block(
                 in_channels=mid_channels,
                 out_channels=out_channels,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def __call__(self, x):
         x = self.conv1(x)
@@ -98,7 +97,7 @@ class BagNetUnit(Chain):
                     in_channels=in_channels,
                     out_channels=out_channels,
                     stride=stride,
-                    activate=False)
+                    activation=None)
             self.activ = F.relu
 
     def __call__(self, x):
@@ -222,7 +221,7 @@ class BagNet(Chain):
 def get_bagnet(field,
                model_name=None,
                pretrained=False,
-               root=os.path.join('~', '.chainer', 'models'),
+               root=os.path.join("~", ".chainer", "models"),
                **kwargs):
     """
     Create BagNet model with specific parameters.

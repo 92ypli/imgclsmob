@@ -117,8 +117,7 @@ class SKNetBottleneck(nn.Module):
         self.conv3 = conv1x1_block(
             in_channels=mid_channels,
             out_channels=out_channels,
-            activation=None,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -156,8 +155,7 @@ class SKNetUnit(nn.Module):
                 in_channels=in_channels,
                 out_channels=out_channels,
                 stride=stride,
-                activation=None,
-                activate=False)
+                activation=None)
         self.activ = nn.ReLU(inplace=True)
 
     def forward(self, x):
@@ -240,7 +238,7 @@ class SKNet(nn.Module):
 def get_sknet(blocks,
               model_name=None,
               pretrained=False,
-              root=os.path.join('~', '.torch', 'models'),
+              root=os.path.join("~", ".torch", "models"),
               **kwargs):
     """
     Create SKNet model with specific parameters.
@@ -340,7 +338,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -362,7 +359,7 @@ def _test():
         assert (model != sknet101 or weight_count == 48736040)
         assert (model != sknet152 or weight_count == 66295656)
 
-        x = Variable(torch.randn(14, 3, 224, 224))
+        x = torch.randn(14, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (14, 1000))

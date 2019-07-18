@@ -68,8 +68,7 @@ class ShakeDropResUnit(nn.Module):
                 in_channels=in_channels,
                 out_channels=out_channels,
                 stride=stride,
-                activation=None,
-                activate=False)
+                activation=None)
         self.activ = nn.ReLU(inplace=True)
         self.shake_drop = ShakeDrop.apply
 
@@ -172,7 +171,7 @@ def get_shakedropresnet_cifar(classes,
                               bottleneck,
                               model_name=None,
                               pretrained=False,
-                              root=os.path.join('~', '.torch', 'models'),
+                              root=os.path.join("~", ".torch", "models"),
                               **kwargs):
     """
     Create ShakeDrop-ResNet model for CIFAR with specific parameters.
@@ -298,7 +297,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -320,7 +318,7 @@ def _test():
         assert (model != shakedropresnet20_cifar100 or weight_count == 278324)
         assert (model != shakedropresnet20_svhn or weight_count == 272474)
 
-        x = Variable(torch.randn(14, 3, 32, 32))
+        x = torch.randn(14, 3, 32, 32)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (14, num_classes))

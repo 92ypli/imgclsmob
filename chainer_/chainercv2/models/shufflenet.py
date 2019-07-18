@@ -1,5 +1,5 @@
 """
-    ShuffleNet, implemented in Chainer.
+    ShuffleNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices,'
     https://arxiv.org/abs/1707.01083.
 """
@@ -205,7 +205,7 @@ def get_shufflenet(groups,
                    width_scale,
                    model_name=None,
                    pretrained=False,
-                   root=os.path.join('~', '.chainer', 'models'),
+                   root=os.path.join("~", ".chainer", "models"),
                    **kwargs):
     """
     Create ShuffleNet model with specific parameters.

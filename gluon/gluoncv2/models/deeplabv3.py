@@ -112,7 +112,7 @@ class AtrousSpatialPyramidPooling(HybridBlock):
         project_in_channels = 5 * mid_channels
 
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(conv1x1_block(
                 in_channels=in_channels,
                 out_channels=mid_channels))
@@ -213,7 +213,7 @@ def get_deeplabv3(backbone,
                   model_name=None,
                   pretrained=False,
                   ctx=cpu(),
-                  root=os.path.join('~', '.mxnet', 'models'),
+                  root=os.path.join("~", ".mxnet", "models"),
                   **kwargs):
     """
     Create DeepLabv3 model with specific parameters.
@@ -250,7 +250,8 @@ def get_deeplabv3(backbone,
             filename=get_model_file(
                 model_name=model_name,
                 local_model_store_dir_path=root),
-            ctx=ctx)
+            ctx=ctx,
+            ignore_extra=True)
 
     return net
 

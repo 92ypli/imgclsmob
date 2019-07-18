@@ -1,11 +1,11 @@
 """
-    ProxylessNAS, implemented in Gluon.
+    ProxylessNAS for ImageNet-1K, implemented in Gluon.
     Original paper: 'ProxylessNAS: Direct Neural Architecture Search on Target Task and Hardware,'
     https://arxiv.org/abs/1812.00332.
 """
 
 __all__ = ['ProxylessNAS', 'proxylessnas_cpu', 'proxylessnas_gpu', 'proxylessnas_mobile', 'proxylessnas_mobile14',
-           'ProxylessUnit']
+           'ProxylessUnit', 'get_proxylessnas']
 
 import os
 from mxnet import cpu
@@ -71,8 +71,7 @@ class ProxylessBlock(HybridBlock):
                 out_channels=out_channels,
                 bn_epsilon=bn_epsilon,
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def hybrid_forward(self, F, x):
         if self.use_bc:
@@ -195,7 +194,7 @@ class ProxylessNAS(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(conv3x3_block(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
@@ -240,7 +239,7 @@ class ProxylessNAS(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -256,7 +255,7 @@ def get_proxylessnas(version,
                      model_name=None,
                      pretrained=False,
                      ctx=cpu(),
-                     root=os.path.join('~', '.mxnet', 'models'),
+                     root=os.path.join("~", ".mxnet", "models"),
                      **kwargs):
     """
     Create ProxylessNAS model with specific parameters.

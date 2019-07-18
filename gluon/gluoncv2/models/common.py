@@ -2,10 +2,11 @@
     Common routines for models in Gluon.
 """
 
-__all__ = ['ReLU6', 'PReLU2', 'conv1x1', 'conv3x3', 'depthwise_conv3x3', 'ConvBlock', 'conv1x1_block', 'conv3x3_block',
-           'conv7x7_block', 'dwconv3x3_block', 'PreConvBlock', 'pre_conv1x1_block', 'pre_conv3x3_block',
-           'ChannelShuffle', 'ChannelShuffle2', 'SEBlock', 'IBN', 'DualPathSequential', 'ParametricSequential',
-           'Concurrent', 'ParametricConcurrent', 'Hourglass', 'SesquialteralHourglass', 'MultiOutputSequential']
+__all__ = ['ReLU6', 'PReLU2', 'HSwish', 'conv1x1', 'conv3x3', 'depthwise_conv3x3', 'ConvBlock', 'conv1x1_block',
+           'conv3x3_block', 'conv7x7_block', 'dwconv3x3_block', 'dwconv5x5_block', 'PreConvBlock', 'pre_conv1x1_block',
+           'pre_conv3x3_block', 'ChannelShuffle', 'ChannelShuffle2', 'SEBlock', 'IBN', 'DualPathSequential',
+           'ParametricSequential', 'Concurrent', 'ParametricConcurrent', 'Hourglass', 'SesquialteralHourglass',
+           'MultiOutputSequential']
 
 import math
 from inspect import isfunction
@@ -13,7 +14,7 @@ import mxnet as mx
 from mxnet.gluon import nn, HybridBlock
 
 
-class ReLU6(nn.HybridBlock):
+class ReLU6(HybridBlock):
     """
     ReLU6 activation layer.
     """
@@ -21,7 +22,7 @@ class ReLU6(nn.HybridBlock):
         super(ReLU6, self).__init__(**kwargs)
 
     def hybrid_forward(self, F, x):
-        return F.clip(x, 0, 6, name="relu6")
+        return F.clip(x, 0.0, 6.0, name="relu6")
 
 
 class PReLU2(HybridBlock):
@@ -45,6 +46,60 @@ class PReLU2(HybridBlock):
 
     def hybrid_forward(self, F, x, alpha):
         return F.LeakyReLU(x, gamma=alpha, act_type="prelu", name="fwd")
+
+
+class HSigmoid(HybridBlock):
+    """
+    Approximated sigmoid function, so-called hard-version of sigmoid from 'Searching for MobileNetV3,'
+    https://arxiv.org/abs/1905.02244.
+    """
+    def __init__(self, **kwargs):
+        super(HSigmoid, self).__init__(**kwargs)
+
+    def hybrid_forward(self, F, x):
+        return F.clip(x + 3.0, 0.0, 6.0, name="relu6") / 6.0
+
+
+class HSwish(HybridBlock):
+    """
+    H-Swish activation function from 'Searching for MobileNetV3,' https://arxiv.org/abs/1905.02244.
+    """
+    def __init__(self, **kwargs):
+        super(HSwish, self).__init__(**kwargs)
+
+    def hybrid_forward(self, F, x):
+        return x * F.clip(x + 3.0, 0.0, 6.0, name="relu6") / 6.0
+
+
+def get_activation_layer(activation):
+    """
+    Create activation layer from string/function.
+
+    Parameters:
+    ----------
+    activation : function, or str, or HybridBlock
+        Activation function or name of activation function.
+
+    Returns
+    -------
+    HybridBlock
+        Activation layer.
+    """
+    assert (activation is not None)
+    if isfunction(activation):
+        return activation()
+    elif isinstance(activation, str):
+        if activation == "relu6":
+            return ReLU6()
+        elif activation == "swish":
+            return nn.Swish()
+        elif activation == "hswish":
+            return HSwish()
+        else:
+            return nn.Activation(activation)
+    else:
+        assert (isinstance(activation, HybridBlock))
+        return activation
 
 
 def conv1x1(in_channels,
@@ -139,7 +194,7 @@ def depthwise_conv3x3(channels,
 
 class ConvBlock(HybridBlock):
     """
-    Standard convolution block with Batch normalization and ReLU/ReLU6 activation.
+    Standard convolution block with Batch normalization and activation.
 
     Parameters:
     ----------
@@ -165,8 +220,6 @@ class ConvBlock(HybridBlock):
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
     activation : function or str or None, default nn.Activation('relu')
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     """
     def __init__(self,
                  in_channels,
@@ -180,10 +233,9 @@ class ConvBlock(HybridBlock):
                  bn_epsilon=1e-5,
                  bn_use_global_stats=False,
                  activation=(lambda: nn.Activation("relu")),
-                 activate=True,
                  **kwargs):
         super(ConvBlock, self).__init__(**kwargs)
-        self.activate = activate
+        self.activate = (activation is not None)
 
         with self.name_scope():
             self.conv = nn.Conv2D(
@@ -200,16 +252,7 @@ class ConvBlock(HybridBlock):
                 epsilon=bn_epsilon,
                 use_global_stats=bn_use_global_stats)
             if self.activate:
-                assert (activation is not None)
-                if isfunction(activation):
-                    self.activ = activation()
-                elif isinstance(activation, str):
-                    if activation == "relu6":
-                        self.activ = ReLU6()
-                    else:
-                        self.activ = nn.Activation(activation)
-                else:
-                    self.activ = activation
+                self.activ = get_activation_layer(activation)
 
     def hybrid_forward(self, F, x):
         x = self.conv(x)
@@ -227,7 +270,6 @@ def conv1x1_block(in_channels,
                   bn_epsilon=1e-5,
                   bn_use_global_stats=False,
                   activation=(lambda: nn.Activation("relu")),
-                  activate=True,
                   **kwargs):
     """
     1x1 version of the standard convolution block.
@@ -250,8 +292,6 @@ def conv1x1_block(in_channels,
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
     activation : function or str or None, default nn.Activation('relu')
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     """
     return ConvBlock(
         in_channels=in_channels,
@@ -264,7 +304,6 @@ def conv1x1_block(in_channels,
         bn_epsilon=bn_epsilon,
         bn_use_global_stats=bn_use_global_stats,
         activation=activation,
-        activate=activate,
         **kwargs)
 
 
@@ -278,7 +317,6 @@ def conv3x3_block(in_channels,
                   bn_epsilon=1e-5,
                   bn_use_global_stats=False,
                   activation=(lambda: nn.Activation("relu")),
-                  activate=True,
                   **kwargs):
     """
     3x3 version of the standard convolution block.
@@ -305,8 +343,6 @@ def conv3x3_block(in_channels,
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
     activation : function or str or None, default nn.Activation('relu')
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     """
     return ConvBlock(
         in_channels=in_channels,
@@ -320,7 +356,58 @@ def conv3x3_block(in_channels,
         bn_epsilon=bn_epsilon,
         bn_use_global_stats=bn_use_global_stats,
         activation=activation,
-        activate=activate,
+        **kwargs)
+
+
+def conv5x5_block(in_channels,
+                  out_channels,
+                  strides=1,
+                  padding=2,
+                  dilation=1,
+                  groups=1,
+                  use_bias=False,
+                  bn_epsilon=1e-5,
+                  bn_use_global_stats=False,
+                  activation=(lambda: nn.Activation("relu")),
+                  **kwargs):
+    """
+    5x5 version of the standard convolution block.
+
+    Parameters:
+    ----------
+    in_channels : int
+        Number of input channels.
+    out_channels : int
+        Number of output channels.
+    strides : int or tuple/list of 2 int, default 1
+        Strides of the convolution.
+    padding : int or tuple/list of 2 int, default 2
+        Padding value for convolution layer.
+    dilation : int or tuple/list of 2 int, default 1
+        Dilation value for convolution layer.
+    groups : int, default 1
+        Number of groups.
+    use_bias : bool, default False
+        Whether the layer uses a bias vector.
+    bn_epsilon : float, default 1e-5
+        Small float added to variance in Batch norm.
+    bn_use_global_stats : bool, default False
+        Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
+    activation : function or str or None, default nn.Activation('relu')
+        Activation function or name of activation function.
+    """
+    return ConvBlock(
+        in_channels=in_channels,
+        out_channels=out_channels,
+        kernel_size=5,
+        strides=strides,
+        padding=padding,
+        dilation=dilation,
+        groups=groups,
+        use_bias=use_bias,
+        bn_epsilon=bn_epsilon,
+        bn_use_global_stats=bn_use_global_stats,
+        activation=activation,
         **kwargs)
 
 
@@ -331,7 +418,6 @@ def conv7x7_block(in_channels,
                   use_bias=False,
                   bn_use_global_stats=False,
                   activation=(lambda: nn.Activation("relu")),
-                  activate=True,
                   **kwargs):
     """
     7x7 version of the standard convolution block.
@@ -352,8 +438,6 @@ def conv7x7_block(in_channels,
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
     activation : function or str or None, default nn.Activation('relu')
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     """
     return ConvBlock(
         in_channels=in_channels,
@@ -364,19 +448,18 @@ def conv7x7_block(in_channels,
         use_bias=use_bias,
         bn_use_global_stats=bn_use_global_stats,
         activation=activation,
-        activate=activate,
         **kwargs)
 
 
 def dwconv3x3_block(in_channels,
                     out_channels,
-                    strides,
+                    strides=1,
                     padding=1,
                     dilation=1,
                     use_bias=False,
+                    bn_epsilon=1e-5,
                     bn_use_global_stats=False,
                     activation=(lambda: nn.Activation("relu")),
-                    activate=True,
                     **kwargs):
     """
     3x3 depthwise version of the standard convolution block.
@@ -387,7 +470,7 @@ def dwconv3x3_block(in_channels,
         Number of input channels.
     out_channels : int
         Number of output channels.
-    strides : int or tuple/list of 2 int
+    strides : int or tuple/list of 2 int, default 1
         Strides of the convolution.
     padding : int or tuple/list of 2 int, default 1
         Padding value for convolution layer.
@@ -395,12 +478,12 @@ def dwconv3x3_block(in_channels,
         Dilation value for convolution layer.
     use_bias : bool, default False
         Whether the layer uses a bias vector.
+    bn_epsilon : float, default 1e-5
+        Small float added to variance in Batch norm.
     bn_use_global_stats : bool, default False
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
     activation : function or str or None, default nn.Activation('relu')
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     """
     return conv3x3_block(
         in_channels=in_channels,
@@ -410,9 +493,57 @@ def dwconv3x3_block(in_channels,
         dilation=dilation,
         groups=out_channels,
         use_bias=use_bias,
+        bn_epsilon=bn_epsilon,
         bn_use_global_stats=bn_use_global_stats,
         activation=activation,
-        activate=activate,
+        **kwargs)
+
+
+def dwconv5x5_block(in_channels,
+                    out_channels,
+                    strides=1,
+                    padding=2,
+                    dilation=1,
+                    use_bias=False,
+                    bn_epsilon=1e-5,
+                    bn_use_global_stats=False,
+                    activation=(lambda: nn.Activation("relu")),
+                    **kwargs):
+    """
+    5x5 depthwise version of the standard convolution block.
+
+    Parameters:
+    ----------
+    in_channels : int
+        Number of input channels.
+    out_channels : int
+        Number of output channels.
+    strides : int or tuple/list of 2 int, default 1
+        Strides of the convolution.
+    padding : int or tuple/list of 2 int, default 2
+        Padding value for convolution layer.
+    dilation : int or tuple/list of 2 int, default 1
+        Dilation value for convolution layer.
+    use_bias : bool, default False
+        Whether the layer uses a bias vector.
+    bn_epsilon : float, default 1e-5
+        Small float added to variance in Batch norm.
+    bn_use_global_stats : bool, default False
+        Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
+    activation : function or str or None, default nn.Activation('relu')
+        Activation function or name of activation function.
+    """
+    return conv5x5_block(
+        in_channels=in_channels,
+        out_channels=out_channels,
+        strides=strides,
+        padding=padding,
+        dilation=dilation,
+        groups=out_channels,
+        use_bias=use_bias,
+        bn_epsilon=bn_epsilon,
+        bn_use_global_stats=bn_use_global_stats,
+        activation=activation,
         **kwargs)
 
 
@@ -675,10 +806,16 @@ class SEBlock(HybridBlock):
         Number of channels.
     reduction : int, default 16
         Squeeze reduction value.
+    approx_sigmoid : bool, default False
+        Whether to use approximated sigmoid function.
+    activation : function, or str, or HybridBlock
+        Activation function or name of activation function.
     """
     def __init__(self,
                  channels,
                  reduction=16,
+                 approx_sigmoid=False,
+                 activation=(lambda: nn.Activation("relu")),
                  **kwargs):
         super(SEBlock, self).__init__(**kwargs)
         mid_cannels = channels // reduction
@@ -688,17 +825,17 @@ class SEBlock(HybridBlock):
                 in_channels=channels,
                 out_channels=mid_cannels,
                 use_bias=True)
-            self.relu = nn.Activation('relu')
+            self.activ = get_activation_layer(activation)
             self.conv2 = conv1x1(
                 in_channels=mid_cannels,
                 out_channels=channels,
                 use_bias=True)
-            self.sigmoid = nn.Activation('sigmoid')
+            self.sigmoid = HSigmoid() if approx_sigmoid else nn.Activation("sigmoid")
 
     def hybrid_forward(self, F, x):
         w = F.contrib.AdaptiveAvgPooling2D(x, output_size=1)
         w = self.conv1(w)
-        w = self.relu(w)
+        w = self.activ(w)
         w = self.conv2(w)
         w = self.sigmoid(w)
         x = F.broadcast_mul(x, w)

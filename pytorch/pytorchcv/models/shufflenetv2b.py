@@ -1,5 +1,5 @@
 """
-    ShuffleNet V2, implemented in PyTorch. The alternative version.
+    ShuffleNet V2 for ImageNet-1K, implemented in PyTorch. The alternative version.
     Original paper: 'ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design,'
     https://arxiv.org/abs/1807.11164.
 """
@@ -57,8 +57,7 @@ class ShuffleUnit(nn.Module):
             in_channels=mid_channels,
             out_channels=mid_channels,
             stride=(2 if self.downsample else 1),
-            activation=None,
-            activate=False)
+            activation=None)
         self.conv2 = conv1x1_block(
             in_channels=mid_channels,
             out_channels=y2_out_channels)
@@ -69,8 +68,7 @@ class ShuffleUnit(nn.Module):
                 in_channels=in_channels,
                 out_channels=in_channels,
                 stride=2,
-                activation=None,
-                activate=False)
+                activation=None)
             self.shortcut_conv = conv1x1_block(
                 in_channels=in_channels,
                 out_channels=in_channels)
@@ -225,7 +223,7 @@ def get_shufflenetv2b(width_scale,
                       shuffle_group_first=True,
                       model_name=None,
                       pretrained=False,
-                      root=os.path.join('~', '.torch', 'models'),
+                      root=os.path.join("~", ".torch", "models"),
                       **kwargs):
     """
     Create ShuffleNetV2(b) model with specific parameters.
@@ -362,7 +360,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -386,7 +383,7 @@ def _test():
         assert (model != shufflenetv2b_w3d2 or weight_count == 4410194)
         assert (model != shufflenetv2b_w2 or weight_count == 7611290)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

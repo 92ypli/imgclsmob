@@ -1,5 +1,5 @@
 """
-    ShaResNet, implemented in Chainer.
+    ShaResNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'ShaResNet: reducing residual network parameter number by sharing weights,'
     https://arxiv.org/abs/1702.08782.
 """
@@ -232,8 +232,7 @@ class ShaResBottleneck(Chain):
             self.conv3 = conv1x1_block(
                 in_channels=mid_channels,
                 out_channels=out_channels,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def __call__(self, x):
         x = self.conv1(x)
@@ -290,7 +289,7 @@ class ShaResUnit(Chain):
                     in_channels=in_channels,
                     out_channels=out_channels,
                     stride=stride,
-                    activate=False)
+                    activation=None)
             self.activ = F.relu
 
     def __call__(self, x):
@@ -387,7 +386,7 @@ def get_sharesnet(blocks,
                   conv1_stride=True,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.chainer', 'models'),
+                  root=os.path.join("~", ".chainer", "models"),
                   **kwargs):
     """
     Create ShaResNet model with specific parameters.

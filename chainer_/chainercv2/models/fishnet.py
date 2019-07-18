@@ -1,5 +1,5 @@
 """
-    FishNet, implemented in Chainer.
+    FishNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'FishNet: A Versatile Backbone for Image, Region, and Pixel Level Prediction,'
     http://papers.nips.cc/paper/7356-fishnet-a-versatile-backbone-for-image-region-and-pixel-level-prediction.pdf.
 """
@@ -538,7 +538,7 @@ class FishNet(Chain):
 def get_fishnet(blocks,
                 model_name=None,
                 pretrained=False,
-                root=os.path.join('~', '.chainer', 'models'),
+                root=os.path.join("~", ".chainer", "models"),
                 **kwargs):
     """
     Create FishNet model with specific parameters.

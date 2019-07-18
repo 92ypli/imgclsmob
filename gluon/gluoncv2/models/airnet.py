@@ -1,5 +1,5 @@
 """
-    AirNet, implemented in Gluon.
+    AirNet for ImageNet-1K, implemented in Gluon.
     Original paper: 'Attention Inspiring Receptive-Fields Network for Learning Invariant Representations,'
     https://ieeexplore.ieee.org/document/8510896.
 """
@@ -62,7 +62,7 @@ class AirBlock(HybridBlock):
                 in_channels=mid_channels,
                 out_channels=out_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activate=False)
+                activation=None)
             self.sigmoid = nn.Activation("sigmoid")
 
     def hybrid_forward(self, F, x):
@@ -120,7 +120,7 @@ class AirBottleneck(HybridBlock):
                 in_channels=mid_channels,
                 out_channels=out_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activate=False)
+                activation=None)
             if self.use_air_block:
                 self.air = AirBlock(
                     in_channels=in_channels,
@@ -184,7 +184,7 @@ class AirUnit(HybridBlock):
                     out_channels=out_channels,
                     strides=strides,
                     bn_use_global_stats=bn_use_global_stats,
-                    activate=False)
+                    activation=None)
             self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
@@ -283,7 +283,7 @@ class AirNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(AirInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
@@ -309,7 +309,7 @@ class AirNet(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -327,7 +327,7 @@ def get_airnet(blocks,
                model_name=None,
                pretrained=False,
                ctx=cpu(),
-               root=os.path.join('~', '.mxnet', 'models'),
+               root=os.path.join("~", ".mxnet", "models"),
                **kwargs):
     """
     Create AirNet model with specific parameters.

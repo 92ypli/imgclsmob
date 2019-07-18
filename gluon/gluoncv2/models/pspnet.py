@@ -115,7 +115,7 @@ class PyramidPooling(HybridBlock):
         mid_channels = in_channels // 4
 
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(Identity())
             for pool_out_size in pool_out_sizes:
                 self.branches.add(PyramidPoolingBranch(
@@ -203,7 +203,7 @@ def get_pspnet(backbone,
                model_name=None,
                pretrained=False,
                ctx=cpu(),
-               root=os.path.join('~', '.mxnet', 'models'),
+               root=os.path.join("~", ".mxnet", "models"),
                **kwargs):
     """
     Create PSPNet model with specific parameters.
@@ -240,7 +240,8 @@ def get_pspnet(backbone,
             filename=get_model_file(
                 model_name=model_name,
                 local_model_store_dir_path=root),
-            ctx=ctx)
+            ctx=ctx,
+            ignore_extra=True)
 
     return net
 

@@ -15,6 +15,10 @@ _model_sha1 = {name: (error, checksum, repo_release_tag) for name, error, checks
     ('vgg13', '1115', 'f01687c1c2691446602e6a8f769c837b1dfd4bfa', 'v0.0.122'),
     ('vgg16', '0868', 'f6cadf2cf6c3b5f66efe6a80fb26893d89ed4765', 'v0.0.122'),
     ('vgg19', '0823', '99580f953300f445d7e664afe2a913d16725fdd6', 'v0.0.122'),
+    ('bn_vgg11', '0936', '4ff8667b2daba34bb4531744a50c000543e4e524', 'v0.0.339'),
+    ('bn_vgg13', '0888', '0a49f8714fa647684940feb6cffb0a468290a5af', 'v0.0.353'),
+    ('bn_vgg16', '0755', '9948c82dcb133081796d095ebd5cf8815d77f7d1', 'v0.0.359'),
+    ('bn_vgg19', '0689', '8a3197c6a27aa4a271e31610ff6cc58c6b593a81', 'v0.0.360'),
     ('bn_vgg11b', '1058', '44558265426b4ba945af9695628ea7564989115e', 'v0.0.123'),
     ('bn_vgg13b', '1015', '999e47a6a5d4cb493d1af3e31de04d67d25176e8', 'v0.0.123'),
     ('bn_vgg16b', '0866', '1f8251aa987151e89a82f0f209c2a8bbde0f0c47', 'v0.0.123'),
@@ -31,10 +35,11 @@ _model_sha1 = {name: (error, checksum, repo_release_tag) for name, error, checks
     ('resnet26', '0838', 'f647811d7211d82344419b1590fb3ae73433efa7', 'v0.0.305'),
     ('resnetbc26b', '0757', '55c88013263af95b0d391069e34542a5d899cc7d', 'v0.0.313'),
     ('resnet34', '0742', '8faa0ab2cbb8ff4ad3bb62aa82da3dd1eb3ef05d', 'v0.0.291'),
-    ('resnet50', '0642', '39e883839e324b3fdd1e0fc9ba3ca6e2e513e921', 'v0.0.147'),
+    ('resnetbc38b', '0673', '324ac8fecba27d321703b8b51d988c212ef12d74', 'v0.0.328'),
+    ('resnet50', '0605', '34177a2e963820ae5ee9c7b2bd233a2566928774', 'v0.0.329'),
     ('resnet50b', '0609', '4b68417369140303594ae69d5ac5891e9fe91267', 'v0.0.308'),
     ('resnet101', '0601', '3fc260bc67ab133b39f087862f5bc70cf6aa9442', 'v0.0.72'),
-    ('resnet101b', '0540', '4e2ec57c2bf513690734f32591ddbcb2888024fe', 'v0.0.145'),
+    ('resnet101b', '0507', '527dca370eb8a2a4a25025993f8ccce35b00c9ef', 'v0.0.357'),
     ('resnet152', '0535', 'b21844fcaea4e14a91fa17bfa870a3d056d258ea', 'v0.0.144'),
     ('resnet152b', '0523', 'da1f46f37d414f5411d5758f37e842a9facdf919', 'v0.0.143'),
     ('preresnet10', '1401', '3a2eed3b9254d35ba546c9894cf9cc3c6d88aa5c', 'v0.0.249'),
@@ -47,22 +52,34 @@ _model_sha1 = {name: (error, checksum, repo_release_tag) for name, error, checks
     ('preresnet18_w3d4', '1071', '380470ee6733f47898da19916be9ab05a5ccf243', 'v0.0.274'),
     ('preresnet18', '0949', '692e6c11e738c11eaf818d60a214e7a905a873c1', 'v0.0.140'),
     ('preresnet26', '0833', '8de37e08f3c2dd054a1dc4099d4b398097999af6', 'v0.0.316'),
+    ('preresnetbc26b', '0789', '993dd84a36d8f1417e2f5454ec5f3b3159f251c1', 'v0.0.325'),
     ('preresnet34', '0754', '9d5635846928420d41f7304e02a4d33160af45e7', 'v0.0.300'),
-    ('preresnet50', '0668', '822837cf6d9d7366d9964a698ebb0dc7ef507b13', 'v0.0.73'),
+    ('preresnetbc38b', '0634', 'f22aa1c3b9f67717ecb5cb94256be8f2ee57d9c6', 'v0.0.348'),
+    ('preresnet50', '0625', '06130b124a1abf96cc92f7d212ca9b524da02ddd', 'v0.0.330'),
     ('preresnet50b', '0631', '9fc00073139d763ef08e2fc810c2469c9b0182c9', 'v0.0.307'),
     ('preresnet101', '0572', 'cd61594e9e2fb758ca69a38baf31223351638c4f', 'v0.0.73'),
-    ('preresnet101b', '0591', '93ae5e69d58c7f9b50e576e9254dc2eb7711231f', 'v0.0.73'),
+    ('preresnet101b', '0539', 'c0b9e129908051592393ba5e7939a4feb5b82b6c', 'v0.0.351'),
     ('preresnet152', '0529', 'b761f286ab284b916f388cc5d6af00e5ea049081', 'v0.0.73'),
     ('preresnet152b', '0576', 'c036165cdaf177cbd44a58f88241b5161f729a33', 'v0.0.73'),
     ('preresnet200b', '0560', '881e0e2869428d89831bde0c7da219ed69236f16', 'v0.0.73'),
     ('preresnet269b', '0555', 'c799eaf246d3dccf72ac10cdec3f35bd8bf72e71', 'v0.0.239'),
+    ('resnext14_16x4d', '1224', '3f603dde73c4581f60ada40499ed42d800847268', 'v0.0.370'),
+    ('resnext14_32x2d', '1246', 'df7d6b8a824796742a0bb369d654135cd109dfb3', 'v0.0.371'),
+    ('resnext14_32x4d', '1113', 'cac0dad52d391f9268c9fee6f95be59e14952fcc', 'v0.0.327'),
+    ('resnext26_32x4d', '0717', '594567d27cea1f5e324a6ecfd93f209d30c148d9', 'v0.0.332'),
     ('resnext101_32x4d', '0580', 'bf746cb6f52d3329daeb66427517b03159806992', 'v0.0.74'),
     ('resnext101_64x4d', '0543', 'f51ffdb055495036e22f1867205aee69f27518b1', 'v0.0.74'),
+    ('seresnet10', '1336', 'd4a0a9d3e2e2b4188aac06d3b6cc4132f05ac916', 'v0.0.354'),
+    ('seresnet18', '0923', '7aa519d2ec4c721c61a9fd04a9b0ca745f12b24a', 'v0.0.355'),
+    ('seresnet26', '0809', 'b2a8b74fe11edbfa798c35d882d6ebd5cfceb6ff', 'v0.0.363'),
+    ('seresnetbc26b', '0681', '692ccde37b4dc19df0bc5b92256f0023228baf98', 'v0.0.366'),
     ('seresnet50', '0643', 'e022e5b9e58e19c692d00394c85daa57ea943b82', 'v0.0.75'),
     ('seresnet101', '0589', '305d23018de942b25df59d8ac9d2dd14374d7d28', 'v0.0.75'),
     ('seresnet152', '0578', 'd06ab6d909129693da68c552b91f3f344795114f', 'v0.0.75'),
     ('seresnext50_32x4d', '0553', '207232148cb61e6f2af55aa2e3945be52a4329d1', 'v0.0.76'),
     ('seresnext101_32x4d', '0497', '268d7d224024cd3d33ba7b259b6975bd1d064619', 'v0.0.76'),
+    ('senet16', '0803', '366c58ce2f47ded548734cf336d46b50517c78c4', 'v0.0.341'),
+    ('senet28', '0594', '98ba8cc2068495fe192af40328f1838b1e835b6f', 'v0.0.356'),
     ('senet154', '0463', 'c86eaaed79c696a32ace4a8576fc0b50f0f93900', 'v0.0.86'),
     ('densenet121', '0688', 'e3bccdc5544f46352bb91671ac4cd7e2f788952b', 'v0.0.314'),
     ('densenet161', '0617', '9deca33a34a5c4a0a84f0a37920dbfd1cad85cb7', 'v0.0.77'),
@@ -131,13 +148,13 @@ imgclsmob_repo_url = 'https://github.com/osmr/imgclsmob'
 
 def get_model_name_suffix_data(model_name):
     if model_name not in _model_sha1:
-        raise ValueError('Pretrained model for {name} is not available.'.format(name=model_name))
+        raise ValueError("Pretrained model for {name} is not available.".format(name=model_name))
     error, sha1_hash, repo_release_tag = _model_sha1[model_name]
     return error, sha1_hash, repo_release_tag
 
 
 def get_model_file(model_name,
-                   local_model_store_dir_path=os.path.join('~', '.tensorflow', 'models')):
+                   local_model_store_dir_path=os.path.join("~", ".tensorflow", "models")):
     """
     Return location for the pretrained on local file system. This function will download from online model zoo when
     model cannot be found or has mismatch. The root directory will be created if it doesn't exist.
@@ -156,7 +173,7 @@ def get_model_file(model_name,
     """
     error, sha1_hash, repo_release_tag = get_model_name_suffix_data(model_name)
     short_sha1 = sha1_hash[:8]
-    file_name = '{name}-{error}-{short_sha1}.tf.npz'.format(
+    file_name = "{name}-{error}-{short_sha1}.tf.npz".format(
         name=model_name,
         error=error,
         short_sha1=short_sha1)
@@ -166,16 +183,16 @@ def get_model_file(model_name,
         if _check_sha1(file_path, sha1_hash):
             return file_path
         else:
-            logging.warning('Mismatch in the content of model file detected. Downloading again.')
+            logging.warning("Mismatch in the content of model file detected. Downloading again.")
     else:
-        logging.info('Model file not found. Downloading to {}.'.format(file_path))
+        logging.info("Model file not found. Downloading to {}.".format(file_path))
 
     if not os.path.exists(local_model_store_dir_path):
         os.makedirs(local_model_store_dir_path)
 
-    zip_file_path = file_path + '.zip'
+    zip_file_path = file_path + ".zip"
     _download(
-        url='{repo_url}/releases/download/{repo_release_tag}/{file_name}.zip'.format(
+        url="{repo_url}/releases/download/{repo_release_tag}/{file_name}.zip".format(
             repo_url=imgclsmob_repo_url,
             repo_release_tag=repo_release_tag,
             file_name=file_name),
@@ -188,7 +205,7 @@ def get_model_file(model_name,
     if _check_sha1(file_path, sha1_hash):
         return file_path
     else:
-        raise ValueError('Downloaded file has different hash. Please try again.')
+        raise ValueError("Downloaded file has different hash. Please try again.")
 
 
 def _download(url, path=None, overwrite=False, sha1_hash=None, retries=5, verify_ssl=True):
@@ -225,21 +242,21 @@ def _download(url, path=None, overwrite=False, sha1_hash=None, retries=5, verify
         requests = requests_failed_to_import
 
     if path is None:
-        fname = url.split('/')[-1]
+        fname = url.split("/")[-1]
         # Empty filenames are invalid
-        assert fname, 'Can\'t construct file-name from this URL. Please set the `path` option manually.'
+        assert fname, "Can't construct file-name from this URL. Please set the `path` option manually."
     else:
         path = os.path.expanduser(path)
         if os.path.isdir(path):
-            fname = os.path.join(path, url.split('/')[-1])
+            fname = os.path.join(path, url.split("/")[-1])
         else:
             fname = path
     assert retries >= 0, "Number of retries should be at least 0"
 
     if not verify_ssl:
         warnings.warn(
-            'Unverified HTTPS request is being made (verify_ssl=False). '
-            'Adding certificate verification is strongly advised.')
+            "Unverified HTTPS request is being made (verify_ssl=False). "
+            "Adding certificate verification is strongly advised.")
 
     if overwrite or not os.path.exists(fname) or (sha1_hash and not _check_sha1(fname, sha1_hash)):
         dirname = os.path.dirname(os.path.abspath(os.path.expanduser(fname)))
@@ -249,19 +266,19 @@ def _download(url, path=None, overwrite=False, sha1_hash=None, retries=5, verify
             # Disable pyling too broad Exception
             # pylint: disable=W0703
             try:
-                print('Downloading {} from {}...'.format(fname, url))
+                print("Downloading {} from {}...".format(fname, url))
                 r = requests.get(url, stream=True, verify=verify_ssl)
                 if r.status_code != 200:
                     raise RuntimeError("Failed downloading url {}".format(url))
-                with open(fname, 'wb') as f:
+                with open(fname, "wb") as f:
                     for chunk in r.iter_content(chunk_size=1024):
                         if chunk:  # filter out keep-alive new chunks
                             f.write(chunk)
                 if sha1_hash and not _check_sha1(fname, sha1_hash):
-                    raise UserWarning('File {} is downloaded but the content hash does not match.'
-                                      ' The repo may be outdated or download may be incomplete. '
-                                      'If the "repo_url" is overridden, consider switching to '
-                                      'the default repo.'.format(fname))
+                    raise UserWarning("File {} is downloaded but the content hash does not match."
+                                      " The repo may be outdated or download may be incomplete. "
+                                      "If the `repo_url` is overridden, consider switching to "
+                                      "the default repo.".format(fname))
                 break
             except Exception as e:
                 retries -= 1
@@ -269,7 +286,7 @@ def _download(url, path=None, overwrite=False, sha1_hash=None, retries=5, verify
                     raise e
                 else:
                     print("download failed, retrying, {} attempt{} left"
-                          .format(retries, 's' if retries > 1 else ''))
+                          .format(retries, "s" if retries > 1 else ""))
 
     return fname
 
@@ -290,7 +307,7 @@ def _check_sha1(filename, sha1_hash):
         Whether the file content matches the expected hash.
     """
     sha1 = hashlib.sha1()
-    with open(filename, 'rb') as f:
+    with open(filename, "rb") as f:
         while True:
             data = f.read(1048576)
             if not data:
@@ -316,9 +333,9 @@ def load_state_dict(file_path):
     """
     import numpy as np
     assert os.path.exists(file_path) and os.path.isfile(file_path)
-    if file_path.endswith('.npy'):
-        state_dict = np.load(file_path, encoding='latin1').item()
-    elif file_path.endswith('.npz'):
+    if file_path.endswith(".npy"):
+        state_dict = np.load(file_path, encoding="latin1").item()
+    elif file_path.endswith(".npz"):
         state_dict = dict(np.load(file_path))
     else:
         raise NotImplementedError
@@ -326,7 +343,7 @@ def load_state_dict(file_path):
 
 
 def download_state_dict(model_name,
-                        local_model_store_dir_path=os.path.join('~', '.tensorflow', 'models')):
+                        local_model_store_dir_path=os.path.join("~", ".tensorflow", "models")):
     """
     Load model state dictionary from a file with downloading it if necessary.
 

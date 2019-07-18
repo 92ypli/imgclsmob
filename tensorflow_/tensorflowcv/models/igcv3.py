@@ -1,5 +1,5 @@
 """
-    IGCV3, implemented in TensorFlow.
+    IGCV3 for ImageNet-1K, implemented in TensorFlow.
     Original paper: 'IGCV3: Interleaved Low-Rank Group Convolutions for Efficient Deep Neural Networks,'
     https://arxiv.org/abs/1806.00178.
 """
@@ -59,7 +59,6 @@ def inv_res_unit(x,
         out_channels=mid_channels,
         groups=groups,
         activation=None,
-        activate=False,
         training=training,
         data_format=data_format,
         name=name + "/conv1")
@@ -82,7 +81,6 @@ def inv_res_unit(x,
         out_channels=out_channels,
         groups=groups,
         activation=None,
-        activate=False,
         training=training,
         data_format=data_format,
         name=name + "/conv3")
@@ -207,7 +205,7 @@ class IGCV3(object):
 def get_igcv3(width_scale,
               model_name=None,
               pretrained=False,
-              root=os.path.join('~', '.tensorflow', 'models'),
+              root=os.path.join("~", ".tensorflow", "models"),
               **kwargs):
     """
     Create IGCV3-D model with specific parameters.

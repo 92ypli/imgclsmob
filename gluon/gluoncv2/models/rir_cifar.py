@@ -199,14 +199,14 @@ class CIFARRiR(HybridBlock):
                 return_two=False,
                 first_ordinals=0,
                 last_ordinals=0,
-                prefix='')
+                prefix="")
             self.features.add(RiRInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
                 bn_use_global_stats=bn_use_global_stats))
             in_channels = init_block_channels
             for i, channels_per_stage in enumerate(channels):
-                stage = DualPathSequential(prefix='stage{}_'.format(i + 1))
+                stage = DualPathSequential(prefix="stage{}_".format(i + 1))
                 for j, out_channels in enumerate(channels_per_stage):
                     strides = 2 if (j == 0) and (i != 0) else 1
                     stage.add(RiRUnit(
@@ -219,13 +219,12 @@ class CIFARRiR(HybridBlock):
             self.features.add(RiRFinalBlock())
             in_channels = final_block_channels
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(conv1x1_block(
                 in_channels=in_channels,
                 out_channels=classes,
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False))
+                activation=None))
             self.output.add(nn.AvgPool2D(
                 pool_size=8,
                 strides=1))
@@ -241,7 +240,7 @@ def get_rir_cifar(classes,
                   model_name=None,
                   pretrained=False,
                   ctx=cpu(),
-                  root=os.path.join('~', '.mxnet', 'models'),
+                  root=os.path.join("~", ".mxnet", "models"),
                   **kwargs):
     """
     Create RiR model for CIFAR with specific parameters.

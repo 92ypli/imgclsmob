@@ -1,5 +1,5 @@
 """
-    BN-Inception, implemented in Gluon.
+    BN-Inception for ImageNet-1K, implemented in Gluon.
     Original paper: 'Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift,'
     https://arxiv.org/abs/1502.03167.
 """
@@ -240,7 +240,7 @@ class InceptionBlock(HybridBlock):
         assert (len(mid2_channels_list) == 4)
 
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(conv1x1_block(
                 in_channels=in_channels,
                 out_channels=mid2_channels_list[0],
@@ -293,7 +293,7 @@ class ReductionBlock(HybridBlock):
         assert (len(mid2_channels_list) == 4)
 
         with self.name_scope():
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(Inception3x3Branch(
                 in_channels=in_channels,
                 out_channels=mid2_channels_list[1],
@@ -357,7 +357,7 @@ class BNInception(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(StemBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels_list[1],
@@ -390,7 +390,7 @@ class BNInception(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -405,7 +405,7 @@ class BNInception(HybridBlock):
 def get_bninception(model_name=None,
                     pretrained=False,
                     ctx=cpu(),
-                    root=os.path.join('~', '.mxnet', 'models'),
+                    root=os.path.join("~", ".mxnet", "models"),
                     **kwargs):
     """
     Create BN-Inception model with specific parameters.

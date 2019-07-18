@@ -1,9 +1,10 @@
 """
-    ResNeXt, implemented in Gluon.
+    ResNeXt for ImageNet-1K, implemented in Gluon.
     Original paper: 'Aggregated Residual Transformations for Deep Neural Networks,' http://arxiv.org/abs/1611.05431.
 """
 
-__all__ = ['ResNeXt', 'resnext14_32x4d', 'resnext26_32x4d', 'resnext50_32x4d', 'resnext101_32x4d', 'resnext101_64x4d',
+__all__ = ['ResNeXt', 'resnext14_16x4d', 'resnext14_32x2d', 'resnext14_32x4d', 'resnext26_16x4d', 'resnext26_32x2d',
+           'resnext26_32x4d', 'resnext38_32x4d', 'resnext50_32x4d', 'resnext101_32x4d', 'resnext101_64x4d',
            'ResNeXtBottleneck', 'ResNeXtUnit']
 
 import os
@@ -32,6 +33,8 @@ class ResNeXtBottleneck(HybridBlock):
         Width of bottleneck block.
     bn_use_global_stats : bool
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
+    bottleneck_factor : int, default 4
+        Bottleneck factor.
     """
     def __init__(self,
                  in_channels,
@@ -40,9 +43,10 @@ class ResNeXtBottleneck(HybridBlock):
                  cardinality,
                  bottleneck_width,
                  bn_use_global_stats,
+                 bottleneck_factor=4,
                  **kwargs):
         super(ResNeXtBottleneck, self).__init__(**kwargs)
-        mid_channels = out_channels // 4
+        mid_channels = out_channels // bottleneck_factor
         D = int(math.floor(mid_channels * (bottleneck_width / 64.0)))
         group_width = cardinality * D
 
@@ -61,7 +65,7 @@ class ResNeXtBottleneck(HybridBlock):
                 in_channels=group_width,
                 out_channels=out_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activate=False)
+                activation=None)
 
     def hybrid_forward(self, F, x):
         x = self.conv1(x)
@@ -114,7 +118,7 @@ class ResNeXtUnit(HybridBlock):
                     out_channels=out_channels,
                     strides=strides,
                     bn_use_global_stats=bn_use_global_stats,
-                    activate=False)
+                    activation=None)
             self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
@@ -167,7 +171,7 @@ class ResNeXt(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(ResInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
@@ -191,7 +195,7 @@ class ResNeXt(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -209,7 +213,7 @@ def get_resnext(blocks,
                 model_name=None,
                 pretrained=False,
                 ctx=cpu(),
-                root=os.path.join('~', '.mxnet', 'models'),
+                root=os.path.join("~", ".mxnet", "models"),
                 **kwargs):
     """
     Create ResNeXt model with specific parameters.
@@ -245,6 +249,8 @@ def get_resnext(blocks,
     else:
         raise ValueError("Unsupported ResNeXt with number of blocks: {}".format(blocks))
 
+    assert (sum(layers) * 3 + 2 == blocks)
+
     init_block_channels = 64
     channels_per_layers = [256, 512, 1024, 2048]
 
@@ -270,6 +276,40 @@ def get_resnext(blocks,
     return net
 
 
+def resnext14_16x4d(**kwargs):
+    """
+    ResNeXt-14 (16x4d) model from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    ctx : Context, default CPU
+        The context in which to load the pretrained weights.
+    root : str, default '~/.mxnet/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext(blocks=14, cardinality=16, bottleneck_width=4, model_name="resnext14_16x4d", **kwargs)
+
+
+def resnext14_32x2d(**kwargs):
+    """
+    ResNeXt-14 (32x2d) model from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    ctx : Context, default CPU
+        The context in which to load the pretrained weights.
+    root : str, default '~/.mxnet/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext(blocks=14, cardinality=32, bottleneck_width=2, model_name="resnext14_32x2d", **kwargs)
+
+
 def resnext14_32x4d(**kwargs):
     """
     ResNeXt-14 (32x4d) model from 'Aggregated Residual Transformations for Deep Neural Networks,'
@@ -287,6 +327,40 @@ def resnext14_32x4d(**kwargs):
     return get_resnext(blocks=14, cardinality=32, bottleneck_width=4, model_name="resnext14_32x4d", **kwargs)
 
 
+def resnext26_16x4d(**kwargs):
+    """
+    ResNeXt-26 (16x4d) model from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    ctx : Context, default CPU
+        The context in which to load the pretrained weights.
+    root : str, default '~/.mxnet/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext(blocks=26, cardinality=16, bottleneck_width=4, model_name="resnext26_16x4d", **kwargs)
+
+
+def resnext26_32x2d(**kwargs):
+    """
+    ResNeXt-26 (32x2d) model from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    ctx : Context, default CPU
+        The context in which to load the pretrained weights.
+    root : str, default '~/.mxnet/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext(blocks=26, cardinality=32, bottleneck_width=2, model_name="resnext26_32x2d", **kwargs)
+
+
 def resnext26_32x4d(**kwargs):
     """
     ResNeXt-26 (32x4d) model from 'Aggregated Residual Transformations for Deep Neural Networks,'
@@ -302,6 +376,23 @@ def resnext26_32x4d(**kwargs):
         Location for keeping the model parameters.
     """
     return get_resnext(blocks=26, cardinality=32, bottleneck_width=4, model_name="resnext26_32x4d", **kwargs)
+
+
+def resnext38_32x4d(**kwargs):
+    """
+    ResNeXt-38 (32x4d) model from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    ctx : Context, default CPU
+        The context in which to load the pretrained weights.
+    root : str, default '~/.mxnet/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext(blocks=38, cardinality=32, bottleneck_width=4, model_name="resnext38_32x4d", **kwargs)
 
 
 def resnext50_32x4d(**kwargs):
@@ -362,8 +453,13 @@ def _test():
     pretrained = False
 
     models = [
+        resnext14_16x4d,
+        resnext14_32x2d,
         resnext14_32x4d,
+        resnext26_16x4d,
+        resnext26_32x2d,
         resnext26_32x4d,
+        resnext38_32x4d,
         resnext50_32x4d,
         resnext101_32x4d,
         resnext101_64x4d,
@@ -384,8 +480,13 @@ def _test():
                 continue
             weight_count += np.prod(param.shape)
         print("m={}, {}".format(model.__name__, weight_count))
+        assert (model != resnext14_16x4d or weight_count == 7127336)
+        assert (model != resnext14_32x2d or weight_count == 7029416)
         assert (model != resnext14_32x4d or weight_count == 9411880)
+        assert (model != resnext26_16x4d or weight_count == 10119976)
+        assert (model != resnext26_32x2d or weight_count == 9924136)
         assert (model != resnext26_32x4d or weight_count == 15389480)
+        assert (model != resnext38_32x4d or weight_count == 21367080)
         assert (model != resnext50_32x4d or weight_count == 25028904)
         assert (model != resnext101_32x4d or weight_count == 44177704)
         assert (model != resnext101_64x4d or weight_count == 83455272)

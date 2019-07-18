@@ -1,5 +1,5 @@
 """
-    DiracNetV2, implemented in PyTorch.
+    DiracNetV2 for ImageNet-1K, implemented in PyTorch.
     Original paper: 'DiracNets: Training Very Deep Neural Networks Without Skip-Connections,'
     https://arxiv.org/abs/1706.00388.
 """
@@ -178,7 +178,7 @@ class DiracNetV2(nn.Module):
 def get_diracnetv2(blocks,
                    model_name=None,
                    pretrained=False,
-                   root=os.path.join('~', '.torch', 'models'),
+                   root=os.path.join("~", ".torch", "models"),
                    **kwargs):
     """
     Create DiracNetV2 model with specific parameters.
@@ -264,7 +264,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -284,7 +283,7 @@ def _test():
         assert (model != diracnet18v2 or weight_count == 11511784)
         assert (model != diracnet34v2 or weight_count == 21616232)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

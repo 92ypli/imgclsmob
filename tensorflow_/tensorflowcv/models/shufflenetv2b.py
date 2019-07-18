@@ -1,5 +1,5 @@
 """
-    ShuffleNet V2, implemented in TensorFlow. The alternative variant.
+    ShuffleNet V2 for ImageNet-1K, implemented in TensorFlow. The alternative variant.
     Original paper: 'ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design,'
     https://arxiv.org/abs/1807.11164.
 """
@@ -64,7 +64,6 @@ def shuffle_unit(x,
             out_channels=in_channels,
             strides=2,
             activation=None,
-            activate=False,
             training=training,
             data_format=data_format,
             name=name + "/shortcut_dconv")
@@ -95,7 +94,6 @@ def shuffle_unit(x,
         out_channels=mid_channels,
         strides=(2 if downsample else 1),
         activation=None,
-        activate=False,
         training=training,
         data_format=data_format,
         name=name + "/dconv")
@@ -308,7 +306,7 @@ def get_shufflenetv2b(width_scale,
                       shuffle_group_first=True,
                       model_name=None,
                       pretrained=False,
-                      root=os.path.join('~', '.tensorflow', 'models'),
+                      root=os.path.join("~", ".tensorflow", "models"),
                       **kwargs):
     """
     Create ShuffleNetV2(b) model with specific parameters.

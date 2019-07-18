@@ -1,5 +1,5 @@
 """
-    ShuffleNet V2, implemented in Gluon.
+    ShuffleNet V2 for ImageNet-1K, implemented in Gluon.
     Original paper: 'ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design,'
     https://arxiv.org/abs/1807.11164.
 """
@@ -67,7 +67,7 @@ class ShuffleUnit(HybridBlock):
                     out_channels=mid_channels)
                 self.expand_bn5 = nn.BatchNorm(in_channels=mid_channels)
 
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
             self.c_shuffle = ChannelShuffle(
                 channels=out_channels,
                 groups=2)
@@ -171,13 +171,13 @@ class ShuffleNetV2(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(ShuffleInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels))
             in_channels = init_block_channels
             for i, channels_per_stage in enumerate(channels):
-                stage = nn.HybridSequential(prefix='stage{}_'.format(i + 1))
+                stage = nn.HybridSequential(prefix="stage{}_".format(i + 1))
                 with stage.name_scope():
                     for j, out_channels in enumerate(channels_per_stage):
                         downsample = (j == 0)
@@ -197,7 +197,7 @@ class ShuffleNetV2(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -213,7 +213,7 @@ def get_shufflenetv2(width_scale,
                      model_name=None,
                      pretrained=False,
                      ctx=cpu(),
-                     root=os.path.join('~', '.mxnet', 'models'),
+                     root=os.path.join("~", ".mxnet", "models"),
                      **kwargs):
     """
     Create ShuffleNetV2 model with specific parameters.

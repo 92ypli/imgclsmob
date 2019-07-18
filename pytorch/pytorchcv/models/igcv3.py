@@ -1,5 +1,5 @@
 """
-    IGCV3, implemented in PyTorch.
+    IGCV3 for ImageNet-1K, implemented in PyTorch.
     Original paper: 'IGCV3: Interleaved Low-Rank Group Convolutions for Efficient Deep Neural Networks,'
     https://arxiv.org/abs/1806.00178.
 """
@@ -41,8 +41,7 @@ class InvResUnit(nn.Module):
             in_channels=in_channels,
             out_channels=mid_channels,
             groups=groups,
-            activation=None,
-            activate=False)
+            activation=None)
         self.c_shuffle = ChannelShuffle(
             channels=mid_channels,
             groups=groups)
@@ -55,8 +54,7 @@ class InvResUnit(nn.Module):
             in_channels=mid_channels,
             out_channels=out_channels,
             groups=groups,
-            activation=None,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         if self.residual:
@@ -152,7 +150,7 @@ class IGCV3(nn.Module):
 def get_igcv3(width_scale,
               model_name=None,
               pretrained=False,
-              root=os.path.join('~', '.torch', 'models'),
+              root=os.path.join("~", ".torch", "models"),
               **kwargs):
     """
     Create IGCV3-D model with specific parameters.
@@ -278,7 +276,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -302,7 +299,7 @@ def _test():
         assert (model != igcv3_wd2 or weight_count == 1985528)
         assert (model != igcv3_wd4 or weight_count == 1534020)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

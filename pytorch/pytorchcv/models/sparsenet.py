@@ -1,5 +1,5 @@
 """
-    SparseNet, implemented in PyTorch.
+    SparseNet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'Sparsely Aggregated Convolutional Networks,' https://arxiv.org/abs/1801.05895.
 """
 
@@ -42,7 +42,7 @@ class SparseBlock(nn.Module):
         Number of input channels.
     out_channels : int
         Number of output channels.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     """
     def __init__(self,
@@ -83,7 +83,7 @@ class SparseStage(nn.Module):
         Number of output channels for each unit in stage.
     growth_rate : int
         Growth rate for blocks.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     do_transition : bool
         Whether use transition block.
@@ -197,7 +197,7 @@ class SparseNet(nn.Module):
 def get_sparsenet(num_layers,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.torch', 'models'),
+                  root=os.path.join("~", ".torch", "models"),
                   **kwargs):
     """
     Create SparseNet model with specific parameters.
@@ -345,7 +345,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -371,7 +370,7 @@ def _test():
         assert (model != sparsenet201 or weight_count == 5703144)
         assert (model != sparsenet264 or weight_count == 7717224)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

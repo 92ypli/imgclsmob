@@ -1,5 +1,5 @@
 """
-    SE-PreResNet, implemented in Keras.
+    SE-PreResNet for ImageNet-1K, implemented in Keras.
     Original paper: 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
 """
 
@@ -108,7 +108,8 @@ def sepreresnet(channels,
     classes : int, default 1000
         Number of classification classes.
     """
-    input_shape = (in_channels, 224, 224) if is_channels_first() else (224, 224, in_channels)
+    input_shape = (in_channels, in_size[0], in_size[1]) if is_channels_first() else\
+        (in_size[0], in_size[1], in_channels)
     input = nn.Input(shape=input_shape)
 
     x = preres_init_block(
@@ -154,7 +155,7 @@ def get_sepreresnet(blocks,
                     conv1_stride=True,
                     model_name=None,
                     pretrained=False,
-                    root=os.path.join('~', '.keras', 'models'),
+                    root=os.path.join("~", ".keras", "models"),
                     **kwargs):
     """
     Create PreResNet or SE-PreResNet model with specific parameters.

@@ -663,7 +663,7 @@ def get_octresnet(blocks,
                   width_scale=1.0,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.torch', 'models'),
+                  root=os.path.join("~", ".torch", "models"),
                   **kwargs):
     """
     Create Oct-ResNet model with specific parameters.
@@ -801,7 +801,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -821,7 +820,7 @@ def _test():
         assert (model != octresnet10_ad2 or weight_count == 5423016)
         assert (model != octresnet50b_ad2 or weight_count == 25557032)
 
-        x = Variable(torch.randn(14, 3, 224, 224))
+        x = torch.randn(14, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (14, 1000))

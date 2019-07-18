@@ -1,5 +1,5 @@
 """
-    DLA, implemented in Chainer.
+    DLA for ImageNet-1K, implemented in Chainer.
     Original paper: 'Deep Layer Aggregation,' https://arxiv.org/abs/1707.06484.
 """
 
@@ -117,8 +117,7 @@ class DLAResBlock(Chain):
                 self.project_conv = conv1x1_block(
                     in_channels=in_channels,
                     out_channels=out_channels,
-                    activation=None,
-                    activate=False)
+                    activation=None)
 
     def __call__(self, x):
         down = self.downsample_pool(x) if self.downsample else x
@@ -158,8 +157,7 @@ class DLARoot(Chain):
             self.conv = conv1x1_block(
                 in_channels=in_channels,
                 out_channels=out_channels,
-                activation=None,
-                activate=False)
+                activation=None)
             self.activ = F.relu
 
     def __call__(self, x2, x1, extra):
@@ -399,7 +397,7 @@ def get_dla(levels,
             residual_root=False,
             model_name=None,
             pretrained=False,
-            root=os.path.join('~', '.chainer', 'models'),
+            root=os.path.join("~", ".chainer", "models"),
             **kwargs):
     """
     Create DLA model with specific parameters.

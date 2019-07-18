@@ -1,5 +1,5 @@
 """
-    ShuffleNet V2, implemented in Keras.
+    ShuffleNet V2 for ImageNet-1K, implemented in Keras.
     Original paper: 'ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design,'
     https://arxiv.org/abs/1807.11164.
 """
@@ -193,7 +193,8 @@ def shufflenetv2(channels,
     classes : int, default 1000
         Number of classification classes.
     """
-    input_shape = (in_channels, 224, 224) if is_channels_first() else (224, 224, in_channels)
+    input_shape = (in_channels, in_size[0], in_size[1]) if is_channels_first() else\
+        (in_size[0], in_size[1], in_channels)
     input = nn.Input(shape=input_shape)
 
     x = shuffle_init_block(
@@ -241,7 +242,7 @@ def shufflenetv2(channels,
 def get_shufflenetv2(width_scale,
                      model_name=None,
                      pretrained=False,
-                     root=os.path.join('~', '.keras', 'models'),
+                     root=os.path.join("~", ".keras", "models"),
                      **kwargs):
     """
     Create ShuffleNetV2 model with specific parameters.

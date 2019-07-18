@@ -1,5 +1,5 @@
 """
-    MobileNet & FD-MobileNet, implemented in Keras.
+    MobileNet & FD-MobileNet for ImageNet-1K, implemented in Keras.
     Original papers:
     - 'MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications,'
        https://arxiv.org/abs/1704.04861.
@@ -79,7 +79,8 @@ def mobilenet(channels,
     classes : int, default 1000
         Number of classification classes.
     """
-    input_shape = (in_channels, 224, 224) if is_channels_first() else (224, 224, in_channels)
+    input_shape = (in_channels, in_size[0], in_size[1]) if is_channels_first() else\
+        (in_size[0], in_size[1], in_channels)
     input = nn.Input(shape=input_shape)
 
     init_block_channels = channels[0][0]
@@ -122,7 +123,7 @@ def get_mobilenet(version,
                   width_scale,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.keras', 'models'),
+                  root=os.path.join("~", ".keras", "models"),
                   **kwargs):
     """
     Create MobileNet or FD-MobileNet model with specific parameters.

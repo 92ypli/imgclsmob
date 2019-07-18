@@ -1,5 +1,5 @@
 """
-    IGCV3, implemented in Keras.
+    IGCV3 for ImageNet-1K, implemented in Keras.
     Original paper: 'IGCV3: Interleaved Low-Rank Group Convolutions for Efficient Deep Neural Networks,'
     https://arxiv.org/abs/1806.00178.
 """
@@ -54,7 +54,6 @@ def inv_res_unit(x,
         out_channels=mid_channels,
         groups=groups,
         activation=None,
-        activate=False,
         name=name + "/conv1")
     x = channel_shuffle_lambda(
         channels=mid_channels,
@@ -73,7 +72,6 @@ def inv_res_unit(x,
         out_channels=out_channels,
         groups=groups,
         activation=None,
-        activate=False,
         name=name + "/conv3")
 
     if residual:
@@ -107,7 +105,8 @@ def igcv3(channels,
     classes : int, default 1000
         Number of classification classes.
     """
-    input_shape = (in_channels, 224, 224) if is_channels_first() else (224, 224, in_channels)
+    input_shape = (in_channels, in_size[0], in_size[1]) if is_channels_first() else\
+        (in_size[0], in_size[1], in_channels)
     input = nn.Input(shape=input_shape)
 
     x = conv3x3_block(
@@ -158,7 +157,7 @@ def igcv3(channels,
 def get_igcv3(width_scale,
               model_name=None,
               pretrained=False,
-              root=os.path.join('~', '.keras', 'models'),
+              root=os.path.join("~", ".keras", "models"),
               **kwargs):
     """
     Create IGCV3-D model with specific parameters.

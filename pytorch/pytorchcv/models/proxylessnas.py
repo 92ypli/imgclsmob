@@ -1,11 +1,11 @@
 """
-    ProxylessNAS, implemented in PyTorch.
+    ProxylessNAS for ImageNet-1K, implemented in PyTorch.
     Original paper: 'ProxylessNAS: Direct Neural Architecture Search on Target Task and Hardware,'
     https://arxiv.org/abs/1812.00332.
 """
 
 __all__ = ['ProxylessNAS', 'proxylessnas_cpu', 'proxylessnas_gpu', 'proxylessnas_mobile', 'proxylessnas_mobile14',
-           'ProxylessUnit']
+           'ProxylessUnit', 'get_proxylessnas']
 
 import os
 import torch.nn as nn
@@ -64,8 +64,7 @@ class ProxylessBlock(nn.Module):
             in_channels=mid_channels,
             out_channels=out_channels,
             bn_eps=bn_eps,
-            activation=None,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         if self.use_bc:
@@ -242,7 +241,7 @@ class ProxylessNAS(nn.Module):
 def get_proxylessnas(version,
                      model_name=None,
                      pretrained=False,
-                     root=os.path.join('~', '.torch', 'models'),
+                     root=os.path.join("~", ".torch", "models"),
                      **kwargs):
     """
     Create ProxylessNAS model with specific parameters.
@@ -389,7 +388,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -413,7 +411,7 @@ def _test():
         assert (model != proxylessnas_mobile or weight_count == 4080512)
         assert (model != proxylessnas_mobile14 or weight_count == 6857568)
 
-        x = Variable(torch.randn(14, 3, 224, 224))
+        x = torch.randn(14, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (14, 1000))

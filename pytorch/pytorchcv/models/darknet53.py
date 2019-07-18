@@ -1,5 +1,5 @@
 """
-    DarkNet-53, implemented in PyTorch.
+    DarkNet-53 for ImageNet-1K, implemented in PyTorch.
     Original source: 'YOLOv3: An Incremental Improvement,' https://arxiv.org/abs/1804.02767.
 """
 
@@ -134,7 +134,7 @@ class DarkNet53(nn.Module):
 
 def get_darknet53(model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.torch', 'models'),
+                  root=os.path.join("~", ".torch", "models"),
                   **kwargs):
     """
     Create DarkNet model with specific parameters.
@@ -195,7 +195,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -213,7 +212,7 @@ def _test():
         print("m={}, {}".format(model.__name__, weight_count))
         assert (model != darknet53 or weight_count == 41609928)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

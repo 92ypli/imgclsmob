@@ -124,8 +124,7 @@ class SKNetBottleneck(Chain):
             self.conv3 = conv1x1_block(
                 in_channels=mid_channels,
                 out_channels=out_channels,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def __call__(self, x):
         x = self.conv1(x)
@@ -164,8 +163,7 @@ class SKNetUnit(Chain):
                     in_channels=in_channels,
                     out_channels=out_channels,
                     stride=stride,
-                    activation=None,
-                    activate=False)
+                    activation=None)
             self.activ = F.relu
 
     def __call__(self, x):
@@ -247,7 +245,7 @@ class SKNet(Chain):
 def get_sknet(blocks,
               model_name=None,
               pretrained=False,
-              root=os.path.join('~', '.chainer', 'models'),
+              root=os.path.join("~", ".chainer", "models"),
               **kwargs):
     """
     Create SKNet model with specific parameters.

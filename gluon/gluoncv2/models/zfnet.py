@@ -1,5 +1,5 @@
 """
-    ZFNet, implemented in Gluon.
+    ZFNet for ImageNet-1K, implemented in Gluon.
     Original paper: 'Visualizing and Understanding Convolutional Networks,' https://arxiv.org/abs/1311.2901.
 """
 
@@ -44,7 +44,7 @@ class ZFNetConv(HybridBlock):
                 padding=padding,
                 use_bias=True,
                 in_channels=in_channels)
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
         x = self.conv(x)
@@ -101,7 +101,7 @@ class ZFNetDense(HybridBlock):
                 units=out_channels,
                 weight_initializer="normal",
                 in_units=in_channels)
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
             self.dropout = nn.Dropout(rate=0.5)
 
     def hybrid_forward(self, F, x):
@@ -183,9 +183,9 @@ class ZFNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             for i, channels_per_stage in enumerate(channels):
-                stage = nn.HybridSequential(prefix='stage{}_'.format(i + 1))
+                stage = nn.HybridSequential(prefix="stage{}_".format(i + 1))
                 with stage.name_scope():
                     if i != 0:
                         stage.add(ZFNetReduceBlock())
@@ -202,7 +202,7 @@ class ZFNet(HybridBlock):
                 pool_size=3,
                 strides=2))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             in_channels = in_channels * 6 * 6
             self.output.add(ZFNetOutputBlock(
@@ -218,7 +218,7 @@ class ZFNet(HybridBlock):
 def get_alexnet(model_name=None,
                 pretrained=False,
                 ctx=cpu(),
-                root=os.path.join('~', '.mxnet', 'models'),
+                root=os.path.join("~", ".mxnet", "models"),
                 **kwargs):
     """
     Create ZFNet model with specific parameters.

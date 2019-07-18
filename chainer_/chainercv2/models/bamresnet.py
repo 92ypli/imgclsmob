@@ -1,5 +1,5 @@
 """
-    BAM-ResNet, implemented in Chainer.
+    BAM-ResNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'BAM: Bottleneck Attention Module,' https://arxiv.org/abs/1807.06514.
 """
 
@@ -119,8 +119,7 @@ class SpatialGate(Chain):
                 in_channels=channels,
                 out_channels=mid_channels,
                 stride=1,
-                use_bias=True,
-                activate=True)
+                use_bias=True)
             self.dil_convs = SimpleSequential()
             with self.dil_convs.init_scope():
                 for i in range(num_dil_convs):
@@ -130,8 +129,7 @@ class SpatialGate(Chain):
                         stride=1,
                         pad=dilate,
                         dilate=dilate,
-                        use_bias=True,
-                        activate=True))
+                        use_bias=True))
             self.final_conv = conv1x1(
                 in_channels=mid_channels,
                 out_channels=1,
@@ -281,7 +279,7 @@ class BamResNet(Chain):
 def get_resnet(blocks,
                model_name=None,
                pretrained=False,
-               root=os.path.join('~', '.chainer', 'models'),
+               root=os.path.join("~", ".chainer", "models"),
                **kwargs):
     """
     Create BAM-ResNet model with specific parameters.

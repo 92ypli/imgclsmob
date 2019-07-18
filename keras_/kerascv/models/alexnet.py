@@ -1,5 +1,5 @@
 """
-    AlexNet, implemented in Keras.
+    AlexNet for ImageNet-1K, implemented in Keras.
     Original paper: 'One weird trick for parallelizing convolutional neural networks,'
     https://arxiv.org/abs/1404.5997.
 """
@@ -161,7 +161,8 @@ def alexnet_model(channels,
     classes : int, default 1000
         Number of classification classes.
     """
-    input_shape = (in_channels, 224, 224) if is_channels_first() else (224, 224, in_channels)
+    input_shape = (in_channels, in_size[0], in_size[1]) if is_channels_first() else\
+        (in_size[0], in_size[1], in_channels)
     input = nn.Input(shape=input_shape)
 
     x = input
@@ -197,7 +198,7 @@ def alexnet_model(channels,
 
 def get_alexnet(model_name=None,
                 pretrained=False,
-                root=os.path.join('~', '.keras', 'models'),
+                root=os.path.join("~", ".keras", "models"),
                 **kwargs):
     """
     Create AlexNet model with specific parameters.

@@ -1,5 +1,5 @@
 """
-    DarkNet, implemented in Keras.
+    DarkNet for ImageNet-1K, implemented in Keras.
     Original source: 'Darknet: Open source neural networks in c,' https://github.com/pjreddie/darknet.
 """
 
@@ -86,7 +86,8 @@ def darknet(channels,
     classes : int, default 1000
         Number of classification classes.
     """
-    input_shape = (in_channels, 224, 224) if is_channels_first() else (224, 224, in_channels)
+    input_shape = (in_channels, in_size[0], in_size[1]) if is_channels_first() else\
+        (in_size[0], in_size[1], in_channels)
     input = nn.Input(shape=input_shape)
 
     x = input
@@ -128,7 +129,7 @@ def darknet(channels,
 def get_darknet(version,
                 model_name=None,
                 pretrained=False,
-                root=os.path.join('~', '.keras', 'models'),
+                root=os.path.join("~", ".keras", "models"),
                 **kwargs):
     """
     Create DarkNet model with specific parameters.

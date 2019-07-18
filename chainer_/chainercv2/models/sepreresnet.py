@@ -1,5 +1,5 @@
 """
-    SE-PreResNet, implemented in Chainer.
+    SE-PreResNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
 """
 
@@ -150,7 +150,7 @@ def get_sepreresnet(blocks,
                     conv1_stride=True,
                     model_name=None,
                     pretrained=False,
-                    root=os.path.join('~', '.chainer', 'models'),
+                    root=os.path.join("~", ".chainer", "models"),
                     **kwargs):
     """
     Create SE-PreResNet model with specific parameters.

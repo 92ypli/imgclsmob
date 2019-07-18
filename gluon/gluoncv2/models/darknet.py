@@ -1,5 +1,5 @@
 """
-    DarkNet, implemented in Gluon.
+    DarkNet for ImageNet-1K, implemented in Gluon.
     Original source: 'Darknet: Open source neural networks in c,' https://github.com/pjreddie/darknet.
 """
 
@@ -88,9 +88,9 @@ class DarkNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             for i, channels_per_stage in enumerate(channels):
-                stage = nn.HybridSequential(prefix='stage{}_'.format(i + 1))
+                stage = nn.HybridSequential(prefix="stage{}_".format(i + 1))
                 with stage.name_scope():
                     for j, out_channels in enumerate(channels_per_stage):
                         stage.add(dark_convYxY(
@@ -106,7 +106,7 @@ class DarkNet(HybridBlock):
                             strides=2))
                 self.features.add(stage)
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Conv2D(
                 channels=classes,
                 kernel_size=1,
@@ -128,7 +128,7 @@ def get_darknet(version,
                 model_name=None,
                 pretrained=False,
                 ctx=cpu(),
-                root=os.path.join('~', '.mxnet', 'models'),
+                root=os.path.join("~", ".mxnet", "models"),
                 **kwargs):
     """
     Create DarkNet model with specific parameters.

@@ -6,7 +6,7 @@
 __all__ = ['ResNet', 'resnet10', 'resnet12', 'resnet14', 'resnetbc14b', 'resnet16', 'resnet18_wd4', 'resnet18_wd2',
            'resnet18_w3d4', 'resnet18', 'resnet26', 'resnetbc26b', 'resnet34', 'resnetbc38b', 'resnet50', 'resnet50b',
            'resnet101', 'resnet101b', 'resnet152', 'resnet152b', 'resnet200', 'resnet200b', 'ResBlock', 'ResBottleneck',
-           'ResUnit', 'ResInitBlock']
+           'ResUnit', 'ResInitBlock', 'get_resnet']
 
 import os
 from mxnet import cpu
@@ -26,14 +26,14 @@ class ResBlock(HybridBlock):
         Number of output channels.
     strides : int or tuple/list of 2 int
         Strides of the convolution.
-    bn_use_global_stats : bool
+    bn_use_global_stats : bool, default False
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
     """
     def __init__(self,
                  in_channels,
                  out_channels,
                  strides,
-                 bn_use_global_stats,
+                 bn_use_global_stats=False,
                  **kwargs):
         super(ResBlock, self).__init__(**kwargs)
         with self.name_scope():
@@ -46,8 +46,7 @@ class ResBlock(HybridBlock):
                 in_channels=out_channels,
                 out_channels=out_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def hybrid_forward(self, F, x):
         x = self.conv1(x)
@@ -108,8 +107,7 @@ class ResBottleneck(HybridBlock):
                 in_channels=mid_channels,
                 out_channels=out_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def hybrid_forward(self, F, x):
         x = self.conv1(x)
@@ -176,8 +174,7 @@ class ResUnit(HybridBlock):
                     out_channels=out_channels,
                     strides=strides,
                     bn_use_global_stats=bn_use_global_stats,
-                    activation=None,
-                    activate=False)
+                    activation=None)
             self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
@@ -266,7 +263,7 @@ class ResNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(ResInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
@@ -290,7 +287,7 @@ class ResNet(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -309,7 +306,7 @@ def get_resnet(blocks,
                model_name=None,
                pretrained=False,
                ctx=cpu(),
-               root=os.path.join('~', '.mxnet', 'models'),
+               root=os.path.join("~", ".mxnet", "models"),
                **kwargs):
     """
     Create ResNet model with specific parameters.

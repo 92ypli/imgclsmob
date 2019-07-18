@@ -1,5 +1,5 @@
 """
-    ChannelNet, implemented in Gluon.
+    ChannelNet for ImageNet-1K, implemented in Gluon.
     Original paper: 'ChannelNets: Compact and Efficient Convolutional Neural Networks via Channel-Wise Convolutions,'
     https://arxiv.org/abs/1809.01330.
 """
@@ -261,7 +261,7 @@ class SimpleGroupBlock(HybridBlock):
                  **kwargs):
         super(SimpleGroupBlock, self).__init__(**kwargs)
         with self.name_scope():
-            self.blocks = nn.HybridSequential(prefix='')
+            self.blocks = nn.HybridSequential(prefix="")
             for i in range(multi_blocks):
                 self.blocks.add(ChannetDwsConvBlock(
                     in_channels=channels,
@@ -390,7 +390,7 @@ class ChannetUnit(nn.HybridBlock):
         self.merge_type = merge_type
 
         with self.name_scope():
-            self.blocks = nn.HybridSequential(prefix='')
+            self.blocks = nn.HybridSequential(prefix="")
             for i, (out_channels, block_name) in enumerate(zip(out_channels_list, block_names)):
                 strides_i = (strides if i == 0 else 1)
                 if block_name == "channet_conv3x3":
@@ -477,9 +477,9 @@ class ChannelNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             for i, channels_per_stage in enumerate(channels):
-                stage = nn.HybridSequential(prefix='stage{}_'.format(i + 1))
+                stage = nn.HybridSequential(prefix="stage{}_".format(i + 1))
                 with stage.name_scope():
                     for j, out_channels in enumerate(channels_per_stage):
                         strides = 2 if (j == 0) else 1
@@ -501,7 +501,7 @@ class ChannelNet(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -516,7 +516,7 @@ class ChannelNet(HybridBlock):
 def get_channelnet(model_name=None,
                    pretrained=False,
                    ctx=cpu(),
-                   root=os.path.join('~', '.mxnet', 'models'),
+                   root=os.path.join("~", ".mxnet", "models"),
                    **kwargs):
     """
     Create ChannelNet model with specific parameters.

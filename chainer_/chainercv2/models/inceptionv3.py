@@ -1,5 +1,5 @@
 """
-    InceptionV3, implemented in Chainer.
+    InceptionV3 for ImageNet-1K, implemented in Chainer.
     Original paper: 'Rethinking the Inception Architecture for Computer Vision,'
     https://arxiv.org/abs/1512.00567.
 """
@@ -635,7 +635,7 @@ class InceptionV3(Chain):
 
 def get_inceptionv3(model_name=None,
                     pretrained=False,
-                    root=os.path.join('~', '.chainer', 'models'),
+                    root=os.path.join("~", ".chainer", "models"),
                     **kwargs):
     """
     Create InceptionV3 model with specific parameters.

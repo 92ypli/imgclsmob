@@ -1,5 +1,5 @@
 """
-    MnasNet, implemented in PyTorch.
+    MnasNet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'MnasNet: Platform-Aware Neural Architecture Search for Mobile,' https://arxiv.org/abs/1807.11626.
 """
 
@@ -8,114 +8,7 @@ __all__ = ['MnasNet', 'mnasnet']
 import os
 import torch.nn as nn
 import torch.nn.init as init
-
-
-class ConvBlock(nn.Module):
-    """
-    Standard convolution block with Batch normalization and ReLU activation.
-
-    Parameters:
-    ----------
-    in_channels : int
-        Number of input channels.
-    out_channels : int
-        Number of output channels.
-    kernel_size : int or tuple/list of 2 int
-        Convolution window size.
-    stride : int or tuple/list of 2 int
-        Strides of the convolution.
-    padding : int or tuple/list of 2 int
-        Padding value for convolution layer.
-    groups : int, default 1
-        Number of groups.
-    activate : bool, default True
-        Whether activate the convolution block.
-    """
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 kernel_size,
-                 stride,
-                 padding,
-                 groups=1,
-                 activate=True):
-        super(ConvBlock, self).__init__()
-        self.activate = activate
-
-        self.conv = nn.Conv2d(
-            in_channels=in_channels,
-            out_channels=out_channels,
-            kernel_size=kernel_size,
-            stride=stride,
-            padding=padding,
-            groups=groups,
-            bias=False)
-        self.bn = nn.BatchNorm2d(num_features=out_channels)
-        if self.activate:
-            self.activ = nn.ReLU(inplace=True)
-
-    def forward(self, x):
-        x = self.conv(x)
-        x = self.bn(x)
-        if self.activate:
-            x = self.activ(x)
-        return x
-
-
-def conv1x1_block(in_channels,
-                  out_channels,
-                  activate=True):
-    """
-    1x1 version of the standard convolution block.
-
-    Parameters:
-    ----------
-    in_channels : int
-        Number of input channels.
-    out_channels : int
-        Number of output channels.
-    activate : bool, default True
-        Whether activate the convolution block.
-    """
-    return ConvBlock(
-        in_channels=in_channels,
-        out_channels=out_channels,
-        kernel_size=1,
-        stride=1,
-        padding=0,
-        groups=1,
-        activate=activate)
-
-
-def dwconv_block(in_channels,
-                 out_channels,
-                 kernel_size,
-                 stride,
-                 activate=True):
-    """
-    Depthwise version of the standard convolution block.
-
-    Parameters:
-    ----------
-    in_channels : int
-        Number of input channels.
-    out_channels : int
-        Number of output channels.
-    kernel_size : int or tuple/list of 2 int
-        Convolution window size.
-    stride : int or tuple/list of 2 int
-        Strides of the convolution.
-    activate : bool, default True
-        Whether activate the convolution block.
-    """
-    return ConvBlock(
-        in_channels=in_channels,
-        out_channels=out_channels,
-        kernel_size=kernel_size,
-        stride=stride,
-        padding=(kernel_size // 2),
-        groups=out_channels,
-        activate=activate)
+from .common import conv1x1_block, conv3x3_block, dwconv3x3_block, dwconv5x5_block
 
 
 class DwsConvBlock(nn.Module):
@@ -133,11 +26,9 @@ class DwsConvBlock(nn.Module):
                  in_channels,
                  out_channels):
         super(DwsConvBlock, self).__init__()
-        self.dw_conv = dwconv_block(
+        self.dw_conv = dwconv3x3_block(
             in_channels=in_channels,
-            out_channels=in_channels,
-            kernel_size=3,
-            stride=1)
+            out_channels=in_channels)
         self.pw_conv = conv1x1_block(
             in_channels=in_channels,
             out_channels=out_channels)
@@ -174,21 +65,19 @@ class MnasUnit(nn.Module):
         super(MnasUnit, self).__init__()
         self.residual = (in_channels == out_channels) and (stride == 1)
         mid_channels = in_channels * expansion_factor
+        dwconv_block_fn = dwconv3x3_block if kernel_size == 3 else (dwconv5x5_block if kernel_size == 5 else None)
 
         self.conv1 = conv1x1_block(
             in_channels=in_channels,
-            out_channels=mid_channels,
-            activate=True)
-        self.conv2 = dwconv_block(
+            out_channels=mid_channels)
+        self.conv2 = dwconv_block_fn(
             in_channels=mid_channels,
             out_channels=mid_channels,
-            kernel_size=kernel_size,
-            stride=stride,
-            activate=True)
+            stride=stride)
         self.conv3 = conv1x1_block(
             in_channels=mid_channels,
             out_channels=out_channels,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         if self.residual:
@@ -216,14 +105,10 @@ class MnasInitBlock(nn.Module):
                  in_channels,
                  out_channels_list):
         super(MnasInitBlock, self).__init__()
-        self.conv1 = ConvBlock(
+        self.conv1 = conv3x3_block(
             in_channels=in_channels,
             out_channels=out_channels_list[0],
-            kernel_size=3,
-            stride=2,
-            padding=1,
-            groups=1,
-            activate=True)
+            stride=2)
         self.conv2 = DwsConvBlock(
             in_channels=out_channels_list[0],
             out_channels=out_channels_list[1])
@@ -294,8 +179,7 @@ class MnasNet(nn.Module):
             self.features.add_module("stage{}".format(i + 1), stage)
         self.features.add_module('final_block', conv1x1_block(
             in_channels=in_channels,
-            out_channels=final_block_channels,
-            activate=True))
+            out_channels=final_block_channels))
         in_channels = final_block_channels
         self.features.add_module('final_pool', nn.AvgPool2d(
             kernel_size=7,
@@ -323,7 +207,7 @@ class MnasNet(nn.Module):
 
 def get_mnasnet(model_name=None,
                 pretrained=False,
-                root=os.path.join('~', '.torch', 'models'),
+                root=os.path.join("~", ".torch", "models"),
                 **kwargs):
     """
     Create MnasNet model with specific parameters.
@@ -401,7 +285,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -419,7 +302,7 @@ def _test():
         print("m={}, {}".format(model.__name__, weight_count))
         assert (model != mnasnet or weight_count == 4308816)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

@@ -1,5 +1,5 @@
 """
-    X-DenseNet, implemented in Chainer.
+    X-DenseNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'Deep Expander Networks: Efficient Deep Networks from Graph Theory,'
     https://arxiv.org/abs/1711.08757.
 """
@@ -266,7 +266,7 @@ class XDenseUnit(Chain):
         Number of input channels.
     out_channels : int
         Number of output channels.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     expand_ratio : int
         Ratio of expansion.
@@ -388,7 +388,7 @@ def get_xdensenet(blocks,
                   expand_ratio=2,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.chainer', 'models'),
+                  root=os.path.join("~", ".chainer", "models"),
                   **kwargs):
     """
     Create X-DenseNet model with specific parameters.

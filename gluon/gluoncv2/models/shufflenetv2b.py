@@ -1,5 +1,5 @@
 """
-    ShuffleNet V2, implemented in Gluon. The alternative version.
+    ShuffleNet V2 for ImageNet-1K, implemented in Gluon. The alternative version.
     Original paper: 'ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design,'
     https://arxiv.org/abs/1807.11164.
 """
@@ -58,8 +58,7 @@ class ShuffleUnit(HybridBlock):
                 in_channels=mid_channels,
                 out_channels=mid_channels,
                 strides=(2 if self.downsample else 1),
-                activation=None,
-                activate=False)
+                activation=None)
             self.conv2 = conv1x1_block(
                 in_channels=mid_channels,
                 out_channels=y2_out_channels)
@@ -70,8 +69,7 @@ class ShuffleUnit(HybridBlock):
                     in_channels=in_channels,
                     out_channels=in_channels,
                     strides=2,
-                    activation=None,
-                    activate=False)
+                    activation=None)
                 self.shortcut_conv = conv1x1_block(
                     in_channels=in_channels,
                     out_channels=in_channels)
@@ -179,13 +177,13 @@ class ShuffleNetV2b(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(ShuffleInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels))
             in_channels = init_block_channels
             for i, channels_per_stage in enumerate(channels):
-                stage = nn.HybridSequential(prefix='stage{}_'.format(i + 1))
+                stage = nn.HybridSequential(prefix="stage{}_".format(i + 1))
                 with stage.name_scope():
                     for j, out_channels in enumerate(channels_per_stage):
                         downsample = (j == 0)
@@ -206,7 +204,7 @@ class ShuffleNetV2b(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -223,7 +221,7 @@ def get_shufflenetv2b(width_scale,
                       model_name=None,
                       pretrained=False,
                       ctx=cpu(),
-                      root=os.path.join('~', '.mxnet', 'models'),
+                      root=os.path.join("~", ".mxnet", "models"),
                       **kwargs):
     """
     Create ShuffleNetV2(b) model with specific parameters.

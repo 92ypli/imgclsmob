@@ -1,5 +1,5 @@
 """
-    i-RevNet, implemented in PyTorch.
+    i-RevNet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'i-RevNet: Deep Invertible Networks,' https://arxiv.org/abs/1802.07088.
 """
 
@@ -384,7 +384,7 @@ class IRevNet(nn.Module):
 def get_irevnet(blocks,
                 model_name=None,
                 pretrained=False,
-                root=os.path.join('~', '.torch', 'models'),
+                root=os.path.join("~", ".torch", "models"),
                 **kwargs):
     """
     Create i-RevNet model with specific parameters.
@@ -457,7 +457,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -475,7 +474,7 @@ def _test():
         print("m={}, {}".format(model.__name__, weight_count))
         assert (model != irevnet301 or weight_count == 125120356)
 
-        x = Variable(torch.randn(2, 3, 224, 224))
+        x = torch.randn(2, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (2, 1000))

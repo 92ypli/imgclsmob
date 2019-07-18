@@ -23,7 +23,7 @@ class RoRBlock(nn.Module):
         Number of input channels.
     out_channels : int
         Number of output channels.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     """
     def __init__(self,
@@ -39,8 +39,7 @@ class RoRBlock(nn.Module):
         self.conv2 = conv3x3_block(
             in_channels=out_channels,
             out_channels=out_channels,
-            activation=None,
-            activate=False)
+            activation=None)
         if self.use_dropout:
             self.dropout = nn.Dropout(p=dropout_rate)
 
@@ -62,7 +61,7 @@ class RoRResUnit(nn.Module):
         Number of input channels.
     out_channels : int
         Number of output channels.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     last_activate : bool, default True
         Whether activate output.
@@ -84,8 +83,7 @@ class RoRResUnit(nn.Module):
             self.identity_conv = conv1x1_block(
                 in_channels=in_channels,
                 out_channels=out_channels,
-                activation=None,
-                activate=False)
+                activation=None)
         self.activ = nn.ReLU(inplace=True)
 
     def forward(self, x):
@@ -110,7 +108,7 @@ class RoRResStage(nn.Module):
         Number of input channels.
     out_channels_list : list of int
         Number of output channels for each unit.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     downsample : bool, default True
         Whether downsample output.
@@ -126,8 +124,7 @@ class RoRResStage(nn.Module):
         self.shortcut = conv1x1_block(
             in_channels=in_channels,
             out_channels=out_channels_list[-1],
-            activation=None,
-            activate=False)
+            activation=None)
         self.units = nn.Sequential()
         for i, out_channels in enumerate(out_channels_list):
             last_activate = (i != len(out_channels_list) - 1)
@@ -164,7 +161,7 @@ class RoRResBody(nn.Module):
         Number of input channels.
     out_channels_lists : list of list of int
         Number of output channels for each stage.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     """
     def __init__(self,
@@ -176,8 +173,7 @@ class RoRResBody(nn.Module):
             in_channels=in_channels,
             out_channels=out_channels_lists[-1][-1],
             stride=4,
-            activation=None,
-            activate=False)
+            activation=None)
         self.stages = nn.Sequential()
         for i, channels_per_stage in enumerate(out_channels_lists):
             downsample = (i != len(out_channels_lists) - 1)
@@ -266,7 +262,7 @@ def get_ror_cifar(num_classes,
                   blocks,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.torch', 'models'),
+                  root=os.path.join("~", ".torch", "models"),
                   **kwargs):
     """
     Create RoR-3 model for CIFAR with specific parameters.
@@ -476,7 +472,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -510,7 +505,7 @@ def _test():
         assert (model != ror3_164_cifar100 or weight_count == 2518484)
         assert (model != ror3_164_svhn or weight_count == 2512634)
 
-        x = Variable(torch.randn(1, 3, 32, 32))
+        x = torch.randn(1, 3, 32, 32)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, num_classes))

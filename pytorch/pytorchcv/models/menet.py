@@ -1,5 +1,5 @@
 """
-    MENet, implemented in PyTorch.
+    MENet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'Merging and Evolution: Improving Convolutional Neural Networks for Mobile Applications,'
     https://arxiv.org/abs/1803.09127.
 """
@@ -239,7 +239,7 @@ def get_menet(first_stage_channels,
               groups,
               model_name=None,
               pretrained=False,
-              root=os.path.join('~', '.torch', 'models'),
+              root=os.path.join("~", ".torch", "models"),
               **kwargs):
     """
     Create MENet model with specific parameters.
@@ -441,7 +441,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -473,7 +472,7 @@ def _test():
         assert (model != menet352_12x1_g8 or weight_count == 2272872)
         assert (model != menet456_24x1_g3 or weight_count == 5304784)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

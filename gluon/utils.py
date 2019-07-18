@@ -4,6 +4,8 @@ import logging
 import numpy as np
 import mxnet as mx
 from .gluoncv2.model_provider import get_model
+from .cls_metrics import Top1Error, TopKError
+from .seg_metrics import PixelAccuracyMetric, MeanIoUMetric
 
 
 def prepare_mx_context(num_gpus,
@@ -83,8 +85,7 @@ def calc_net_weight_count(net):
     return weight_count
 
 
-def validate(acc_top1,
-             acc_top5,
+def validate(metric,
              net,
              val_data,
              batch_fn,
@@ -93,31 +94,62 @@ def validate(acc_top1,
              ctx):
     if data_source_needs_reset:
         val_data.reset()
-    acc_top1.reset()
-    acc_top5.reset()
+    metric.reset()
     for batch in val_data:
         data_list, labels_list = batch_fn(batch, ctx)
         outputs_list = [net(X.astype(dtype, copy=False)) for X in data_list]
-        acc_top1.update(labels_list, outputs_list)
-        acc_top5.update(labels_list, outputs_list)
-    _, top1 = acc_top1.get()
-    _, top5 = acc_top5.get()
-    return 1.0 - top1, 1.0 - top5
+        metric.update(labels_list, outputs_list)
+    return metric
 
 
-def validate1(accuracy_metric,
-              net,
-              val_data,
-              batch_fn,
-              data_source_needs_reset,
-              dtype,
-              ctx):
-    if data_source_needs_reset:
-        val_data.reset()
-    accuracy_metric.reset()
-    for batch in val_data:
-        data_list, labels_list = batch_fn(batch, ctx)
-        outputs_list = [net(X.astype(dtype, copy=False)) for X in data_list]
-        accuracy_metric.update(labels_list, outputs_list)
-    _, accuracy_value = accuracy_metric.get()
-    return 1.0 - accuracy_value
+def report_accuracy(metric,
+                    extended_log=False):
+    metric_info = metric.get()
+    if extended_log:
+        msg_pattern = "{name}={value:.4f} ({value})"
+    else:
+        msg_pattern = "{name}={value:.4f}"
+    if isinstance(metric, mx.metric.CompositeEvalMetric):
+        msg = ""
+        for m in zip(*metric_info):
+            if msg != "":
+                msg += ", "
+            msg += msg_pattern.format(name=m[0], value=m[1])
+    elif isinstance(metric, mx.metric.EvalMetric):
+        msg = msg_pattern.format(name=metric_info[0], value=metric_info[1])
+    else:
+        raise Exception("Wrong metric type: {}".format(type(metric)))
+    return msg
+
+
+def get_metric(metric_name, metric_extra_kwargs):
+    if metric_name == "Top1Error":
+        return Top1Error(**metric_extra_kwargs)
+    elif metric_name == "TopKError":
+        return TopKError(**metric_extra_kwargs)
+    elif metric_name == "PixelAccuracyMetric":
+        return PixelAccuracyMetric(**metric_extra_kwargs)
+    elif metric_name == "MeanIoUMetric":
+        return MeanIoUMetric(**metric_extra_kwargs)
+    else:
+        raise Exception("Wrong metric name: {}".format(metric_name))
+
+
+def get_composite_metric(metric_names, metric_extra_kwargs):
+    if len(metric_names) == 1:
+        metric = get_metric(metric_names[0], metric_extra_kwargs[0])
+    else:
+        metric = mx.metric.CompositeEvalMetric()
+        for name, extra_kwargs in zip(metric_names, metric_extra_kwargs):
+            metric.add(get_metric(name, extra_kwargs))
+    return metric
+
+
+def get_metric_name(metric, index):
+    if isinstance(metric, mx.metric.CompositeEvalMetric):
+        return metric.metrics[index].name
+    elif isinstance(metric, mx.metric.EvalMetric):
+        assert (index == 0)
+        return metric.name
+    else:
+        raise Exception("Wrong metric type: {}".format(type(metric)))

@@ -1,5 +1,5 @@
 """
-    AlexNet, implemented in TensorFlow.
+    AlexNet for ImageNet-1K, implemented in TensorFlow.
     Original paper: 'One weird trick for parallelizing convolutional neural networks,'
     https://arxiv.org/abs/1404.5997.
 """
@@ -247,7 +247,7 @@ class AlexNet(object):
 
 def get_alexnet(model_name=None,
                 pretrained=False,
-                root=os.path.join('~', '.tensorflow', 'models'),
+                root=os.path.join("~", ".tensorflow", "models"),
                 **kwargs):
     """
     Create AlexNet model with specific parameters.

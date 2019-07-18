@@ -1,5 +1,5 @@
 """
-    IBN(b)-ResNet, implemented in Gluon.
+    IBN(b)-ResNet for ImageNet-1K, implemented in Gluon.
     Original paper: 'Two at Once: Enhancing Learning and Generalization Capacities via IBN-Net,'
     https://arxiv.org/abs/1807.09441.
 """
@@ -152,7 +152,7 @@ class IBNbResUnit(HybridBlock):
                     out_channels=out_channels,
                     strides=strides,
                     bn_use_global_stats=bn_use_global_stats,
-                    activate=False)
+                    activation=None)
             if self.use_inst_norm:
                 self.inst_norm = nn.InstanceNorm(
                     in_channels=out_channels,
@@ -238,7 +238,7 @@ class IBNbResNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(IBNbResInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels))
@@ -261,7 +261,7 @@ class IBNbResNet(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -277,7 +277,7 @@ def get_ibnbresnet(blocks,
                    model_name=None,
                    pretrained=False,
                    ctx=cpu(),
-                   root=os.path.join('~', '.mxnet', 'models'),
+                   root=os.path.join("~", ".mxnet", "models"),
                    **kwargs):
     """
     Create IBN(b)-ResNet model with specific parameters.

@@ -1,5 +1,5 @@
 """
-    DLA, implemented in Gluon.
+    DLA for ImageNet-1K, implemented in Gluon.
     Original paper: 'Deep Layer Aggregation,' https://arxiv.org/abs/1707.06484.
 """
 
@@ -131,8 +131,7 @@ class DLAResBlock(HybridBlock):
                     in_channels=in_channels,
                     out_channels=out_channels,
                     bn_use_global_stats=bn_use_global_stats,
-                    activation=None,
-                    activate=False)
+                    activation=None)
 
     def hybrid_forward(self, F, x):
         down = self.downsample_pool(x) if self.downsample else x
@@ -177,8 +176,7 @@ class DLARoot(HybridBlock):
                 in_channels=in_channels,
                 out_channels=out_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False)
+                activation=None)
             self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x2, x1, extra):
@@ -391,7 +389,7 @@ class DLA(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(DLAInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
@@ -417,7 +415,7 @@ class DLA(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(conv1x1(
                 in_channels=in_channels,
                 out_channels=classes,
@@ -437,7 +435,7 @@ def get_dla(levels,
             model_name=None,
             pretrained=False,
             ctx=cpu(),
-            root=os.path.join('~', '.mxnet', 'models'),
+            root=os.path.join("~", ".mxnet", "models"),
             **kwargs):
     """
     Create DLA model with specific parameters.

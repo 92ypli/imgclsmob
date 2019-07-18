@@ -1,5 +1,5 @@
 """
-    MobileNetV2, implemented in Chainer.
+    MobileNetV2 for ImageNet-1K, implemented in Chainer.
     Original paper: 'MobileNetV2: Inverted Residuals and Linear Bottlenecks,' https://arxiv.org/abs/1801.04381.
 """
 
@@ -50,8 +50,7 @@ class LinearBottleneck(Chain):
             self.conv3 = conv1x1_block(
                 in_channels=mid_channels,
                 out_channels=out_channels,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def __call__(self, x):
         if self.residual:
@@ -145,7 +144,7 @@ class MobileNetV2(Chain):
 def get_mobilenetv2(width_scale,
                     model_name=None,
                     pretrained=False,
-                    root=os.path.join('~', '.chainer', 'models'),
+                    root=os.path.join("~", ".chainer", "models"),
                     **kwargs):
     """
     Create MobileNetV2 model with specific parameters.

@@ -1,5 +1,5 @@
 """
-    InceptionV4, implemented in Chainer.
+    InceptionV4 for ImageNet-1K, implemented in Chainer.
     Original paper: 'Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning,'
     https://arxiv.org/abs/1602.07261.
 """
@@ -664,7 +664,7 @@ class InceptionV4(Chain):
 
 def get_inceptionv4(model_name=None,
                     pretrained=False,
-                    root=os.path.join('~', '.chainer', 'models'),
+                    root=os.path.join("~", ".chainer", "models"),
                     **kwargs):
     """
     Create InceptionV4 model with specific parameters.

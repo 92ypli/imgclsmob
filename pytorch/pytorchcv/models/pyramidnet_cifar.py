@@ -53,8 +53,7 @@ class CIFARPyramidNet(nn.Module):
         self.features.add_module("init_block", conv3x3_block(
             in_channels=in_channels,
             out_channels=init_block_channels,
-            activation=None,
-            activate=False))
+            activation=None))
         in_channels = init_block_channels
         for i, channels_per_stage in enumerate(channels):
             stage = nn.Sequential()
@@ -98,7 +97,7 @@ def get_pyramidnet_cifar(num_classes,
                          bottleneck,
                          model_name=None,
                          pretrained=False,
-                         root=os.path.join('~', '.torch', 'models'),
+                         root=os.path.join("~", ".torch", "models"),
                          **kwargs):
     """
     Create PyramidNet for CIFAR model with specific parameters.
@@ -646,7 +645,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -704,7 +702,7 @@ def _test():
         assert (model != pyramidnet272_a200_bn_cifar100 or weight_count == 26288692)
         assert (model != pyramidnet272_a200_bn_svhn or weight_count == 26210842)
 
-        x = Variable(torch.randn(1, 3, 32, 32))
+        x = torch.randn(1, 3, 32, 32)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, num_classes))

@@ -93,8 +93,7 @@ class ShakeDropResUnit(Chain):
                     in_channels=in_channels,
                     out_channels=out_channels,
                     stride=stride,
-                    activation=None,
-                    activate=False)
+                    activation=None)
             self.activ = F.relu
 
     def __call__(self, x):
@@ -190,7 +189,7 @@ def get_shakedropresnet_cifar(classes,
                               bottleneck,
                               model_name=None,
                               pretrained=False,
-                              root=os.path.join('~', '.chainer', 'models'),
+                              root=os.path.join("~", ".chainer", "models"),
                               **kwargs):
     """
     Create ShakeDrop-ResNet model for CIFAR with specific parameters.

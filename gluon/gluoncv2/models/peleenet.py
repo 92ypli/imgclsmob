@@ -1,5 +1,5 @@
 """
-    PeleeNet, implemented in Gluon.
+    PeleeNet for ImageNet-1K, implemented in Gluon.
     Original paper: 'Pelee: A Real-Time Object Detection System on Mobile Devices,' https://arxiv.org/abs/1804.06882.
 """
 
@@ -128,7 +128,7 @@ class StemBlock(HybridBlock):
                 bn_use_global_stats=bn_use_global_stats,
                 strides=2)
 
-            self.branches = HybridConcurrent(axis=1, prefix='')
+            self.branches = HybridConcurrent(axis=1, prefix="")
             self.branches.add(PeleeBranch1(
                 in_channels=out_channels,
                 out_channels=out_channels,
@@ -272,7 +272,7 @@ class PeleeNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(StemBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
@@ -303,7 +303,7 @@ class PeleeNet(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dropout(rate=dropout_rate))
             self.output.add(nn.Dense(
@@ -319,7 +319,7 @@ class PeleeNet(HybridBlock):
 def get_peleenet(model_name=None,
                  pretrained=False,
                  ctx=cpu(),
-                 root=os.path.join('~', '.mxnet', 'models'),
+                 root=os.path.join("~", ".mxnet", "models"),
                  **kwargs):
     """
     Create PeleeNet model with specific parameters.

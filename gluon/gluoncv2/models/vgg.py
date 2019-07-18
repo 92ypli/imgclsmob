@@ -1,16 +1,16 @@
 """
-    VGG, implemented in Gluon.
+    VGG for ImageNet-1K, implemented in Gluon.
     Original paper: 'Very Deep Convolutional Networks for Large-Scale Image Recognition,'
     https://arxiv.org/abs/1409.1556.
 """
 
 __all__ = ['VGG', 'vgg11', 'vgg13', 'vgg16', 'vgg19', 'bn_vgg11', 'bn_vgg13', 'bn_vgg16', 'bn_vgg19', 'bn_vgg11b',
-           'bn_vgg13b', 'bn_vgg16b', 'bn_vgg19b']
+           'bn_vgg13b', 'bn_vgg16b', 'bn_vgg19b', 'vgg_conv3x3']
 
 import os
 from mxnet import cpu
 from mxnet.gluon import nn, HybridBlock
-from mxnet.initializer import Xavier
+# from mxnet.initializer import Xavier
 
 
 class VGGConv(HybridBlock):
@@ -57,16 +57,16 @@ class VGGConv(HybridBlock):
                 strides=strides,
                 padding=padding,
                 use_bias=use_bias,
-                weight_initializer=Xavier(
-                    rnd_type='gaussian',
-                    factor_type='out',
-                    magnitude=2),
+                # weight_initializer=Xavier(
+                #     rnd_type="gaussian",
+                #     factor_type="out",
+                #     magnitude=2),
                 in_channels=in_channels)
             if self.use_bn:
                 self.bn = nn.BatchNorm(
                     in_channels=out_channels,
                     use_global_stats=bn_use_global_stats)
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
         x = self.conv(x)
@@ -80,7 +80,7 @@ def vgg_conv3x3(in_channels,
                 out_channels,
                 use_bias,
                 use_bn,
-                bn_use_global_stats):
+                bn_use_global_stats=False):
     """
     3x3 version of the VGG specific convolution block.
 
@@ -94,7 +94,7 @@ def vgg_conv3x3(in_channels,
         Whether the convolution layer uses a bias vector.
     use_bn : bool
         Whether to use BatchNorm layers.
-    bn_use_global_stats : bool
+    bn_use_global_stats : bool, default False
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
     """
     return VGGConv(
@@ -128,9 +128,9 @@ class VGGDense(HybridBlock):
         with self.name_scope():
             self.fc = nn.Dense(
                 units=out_channels,
-                weight_initializer="normal",
+                # weight_initializer="normal",
                 in_units=in_channels)
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
             self.dropout = nn.Dropout(rate=0.5)
 
     def hybrid_forward(self, F, x):
@@ -167,7 +167,7 @@ class VGGOutputBlock(HybridBlock):
                 out_channels=mid_channels)
             self.fc3 = nn.Dense(
                 units=classes,
-                weight_initializer="normal",
+                # weight_initializer="normal",
                 in_units=mid_channels)
 
     def hybrid_forward(self, F, x):
@@ -213,9 +213,9 @@ class VGG(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             for i, channels_per_stage in enumerate(channels):
-                stage = nn.HybridSequential(prefix='stage{}_'.format(i + 1))
+                stage = nn.HybridSequential(prefix="stage{}_".format(i + 1))
                 with stage.name_scope():
                     for j, out_channels in enumerate(channels_per_stage):
                         stage.add(vgg_conv3x3(
@@ -231,7 +231,7 @@ class VGG(HybridBlock):
                         padding=0))
                 self.features.add(stage)
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             in_channels = in_channels * 7 * 7
             self.output.add(VGGOutputBlock(
@@ -250,7 +250,7 @@ def get_vgg(blocks,
             model_name=None,
             pretrained=False,
             ctx=cpu(),
-            root=os.path.join('~', '.mxnet', 'models'),
+            root=os.path.join("~", ".mxnet", "models"),
             **kwargs):
     """
     Create VGG model with specific parameters.

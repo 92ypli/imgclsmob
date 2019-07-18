@@ -4,9 +4,9 @@
 """
 
 __all__ = ['ResNet', 'resnet10', 'resnet12', 'resnet14', 'resnetbc14b', 'resnet16', 'resnet18_wd4', 'resnet18_wd2',
-           'resnet18_w3d4', 'resnet18', 'resnet26', 'resnetbc26b', 'resnet34', 'resnet50', 'resnet50b', 'resnet101',
-           'resnet101b', 'resnet152', 'resnet152b', 'resnet200', 'resnet200b', 'ResBlock', 'ResBottleneck', 'ResUnit',
-           'ResInitBlock']
+           'resnet18_w3d4', 'resnet18', 'resnet26', 'resnetbc26b', 'resnet34', 'resnetbc38b', 'resnet50', 'resnet50b',
+           'resnet101', 'resnet101b', 'resnet152', 'resnet152b', 'resnet200', 'resnet200b', 'ResBlock', 'ResBottleneck',
+           'ResUnit', 'ResInitBlock']
 
 import os
 import torch.nn as nn
@@ -39,8 +39,7 @@ class ResBlock(nn.Module):
         self.conv2 = conv3x3_block(
             in_channels=out_channels,
             out_channels=out_channels,
-            activation=None,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -93,8 +92,7 @@ class ResBottleneck(nn.Module):
         self.conv3 = conv1x1_block(
             in_channels=mid_channels,
             out_channels=out_channels,
-            activation=None,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -153,8 +151,7 @@ class ResUnit(nn.Module):
                 in_channels=in_channels,
                 out_channels=out_channels,
                 stride=stride,
-                activation=None,
-                activate=False)
+                activation=None)
         self.activ = nn.ReLU(inplace=True)
 
     def forward(self, x):
@@ -278,7 +275,7 @@ def get_resnet(blocks,
                width_scale=1.0,
                model_name=None,
                pretrained=False,
-               root=os.path.join('~', '.torch', 'models'),
+               root=os.path.join("~", ".torch", "models"),
                **kwargs):
     """
     Create ResNet model with specific parameters.
@@ -321,6 +318,8 @@ def get_resnet(blocks,
         layers = [2, 2, 2, 2]
     elif blocks == 34:
         layers = [3, 4, 6, 3]
+    elif (blocks == 38) and bottleneck:
+        layers = [3, 3, 3, 3]
     elif blocks == 50:
         layers = [3, 4, 6, 3]
     elif blocks == 101:
@@ -548,6 +547,21 @@ def resnet34(**kwargs):
     return get_resnet(blocks=34, model_name="resnet34", **kwargs)
 
 
+def resnetbc38b(**kwargs):
+    """
+    ResNet-BC-38b model from 'Deep Residual Learning for Image Recognition,' https://arxiv.org/abs/1512.03385.
+    It's an experimental model (bottleneck compressed).
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnet(blocks=38, bottleneck=True, conv1_stride=False, model_name="resnetbc38b", **kwargs)
+
+
 def resnet50(**kwargs):
     """
     ResNet-50 model from 'Deep Residual Learning for Image Recognition,' https://arxiv.org/abs/1512.03385.
@@ -676,7 +690,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -693,6 +706,7 @@ def _test():
         resnet26,
         resnetbc26b,
         resnet34,
+        resnetbc38b,
         resnet50,
         resnet50b,
         resnet101,
@@ -723,6 +737,7 @@ def _test():
         assert (model != resnet26 or weight_count == 17960232)
         assert (model != resnetbc26b or weight_count == 15995176)
         assert (model != resnet34 or weight_count == 21797672)
+        assert (model != resnetbc38b or weight_count == 21925416)
         assert (model != resnet50 or weight_count == 25557032)
         assert (model != resnet50b or weight_count == 25557032)
         assert (model != resnet101 or weight_count == 44549160)
@@ -732,7 +747,7 @@ def _test():
         assert (model != resnet200 or weight_count == 64673832)
         assert (model != resnet200b or weight_count == 64673832)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

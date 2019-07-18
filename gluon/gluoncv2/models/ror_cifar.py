@@ -25,7 +25,7 @@ class RoRBlock(HybridBlock):
         Number of output channels.
     bn_use_global_stats : bool
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     """
     def __init__(self,
@@ -46,8 +46,7 @@ class RoRBlock(HybridBlock):
                 in_channels=out_channels,
                 out_channels=out_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False)
+                activation=None)
             if self.use_dropout:
                 self.dropout = nn.Dropout(rate=dropout_rate)
 
@@ -71,7 +70,7 @@ class RoRResUnit(HybridBlock):
         Number of output channels.
     bn_use_global_stats : bool
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     last_activate : bool, default True
         Whether activate output.
@@ -98,8 +97,7 @@ class RoRResUnit(HybridBlock):
                     in_channels=in_channels,
                     out_channels=out_channels,
                     bn_use_global_stats=bn_use_global_stats,
-                    activation=None,
-                    activate=False)
+                    activation=None)
             self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
@@ -126,7 +124,7 @@ class RoRResStage(HybridBlock):
         Number of output channels for each unit.
     bn_use_global_stats : bool
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     downsample : bool, default True
         Whether downsample output.
@@ -146,9 +144,8 @@ class RoRResStage(HybridBlock):
                 in_channels=in_channels,
                 out_channels=out_channels_list[-1],
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False)
-            self.units = nn.HybridSequential(prefix='')
+                activation=None)
+            self.units = nn.HybridSequential(prefix="")
             with self.units.name_scope():
                 for i, out_channels in enumerate(out_channels_list):
                     last_activate = (i != len(out_channels_list) - 1)
@@ -188,7 +185,7 @@ class RoRResBody(HybridBlock):
         Number of output channels for each stage.
     bn_use_global_stats : bool
         Whether global moving statistics is used instead of local batch-norm for BatchNorm layers.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     """
     def __init__(self,
@@ -204,9 +201,8 @@ class RoRResBody(HybridBlock):
                 out_channels=out_channels_lists[-1][-1],
                 strides=4,
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False)
-            self.stages = nn.HybridSequential(prefix='')
+                activation=None)
+            self.stages = nn.HybridSequential(prefix="")
             with self.stages.name_scope():
                 for i, channels_per_stage in enumerate(out_channels_lists):
                     downsample = (i != len(out_channels_lists) - 1)
@@ -264,7 +260,7 @@ class CIFARRoR(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(conv3x3_block(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
@@ -280,7 +276,7 @@ class CIFARRoR(HybridBlock):
                 pool_size=8,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -297,7 +293,7 @@ def get_ror_cifar(classes,
                   model_name=None,
                   pretrained=False,
                   ctx=cpu(),
-                  root=os.path.join('~', '.mxnet', 'models'),
+                  root=os.path.join("~", ".mxnet", "models"),
                   **kwargs):
     """
     Create RoR-3 model for CIFAR with specific parameters.

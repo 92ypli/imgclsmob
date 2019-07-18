@@ -23,7 +23,7 @@ class DenseUnit(nn.Module):
         Number of input channels.
     out_channels : int
         Number of output channels.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     """
     def __init__(self,
@@ -162,7 +162,7 @@ class DenseNet(nn.Module):
 def get_densenet(blocks,
                  model_name=None,
                  pretrained=False,
-                 root=os.path.join('~', '.torch', 'models'),
+                 root=os.path.join("~", ".torch", "models"),
                  **kwargs):
     """
     Create DenseNet model with specific parameters.
@@ -291,7 +291,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -315,7 +314,7 @@ def _test():
         assert (model != densenet169 or weight_count == 14149480)
         assert (model != densenet201 or weight_count == 20013928)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

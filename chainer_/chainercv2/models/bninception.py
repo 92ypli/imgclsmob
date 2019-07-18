@@ -1,5 +1,5 @@
 """
-    BN-Inception, implemented in Chainer.
+    BN-Inception for ImageNet-1K, implemented in Chainer.
     Original paper: 'Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift,'
     https://arxiv.org/abs/1502.03167.
 """
@@ -373,7 +373,7 @@ class BNInception(Chain):
 
 def get_bninception(model_name=None,
                     pretrained=False,
-                    root=os.path.join('~', '.chainer', 'models'),
+                    root=os.path.join("~", ".chainer", "models"),
                     **kwargs):
     """
     Create BN-Inception model with specific parameters.

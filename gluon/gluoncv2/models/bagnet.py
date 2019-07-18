@@ -1,5 +1,5 @@
 """
-    BagNet, implemented in Gluon.
+    BagNet for ImageNet-1K, implemented in Gluon.
     Original paper: 'Approximating CNNs with Bag-of-local-Features models works surprisingly well on ImageNet,'
     https://openreview.net/pdf?id=SkfMWhAqYQ.
 """
@@ -58,8 +58,7 @@ class BagNetBottleneck(HybridBlock):
                 in_channels=mid_channels,
                 out_channels=out_channels,
                 bn_use_global_stats=bn_use_global_stats,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def hybrid_forward(self, F, x):
         x = self.conv1(x)
@@ -108,7 +107,7 @@ class BagNetUnit(HybridBlock):
                     out_channels=out_channels,
                     strides=strides,
                     bn_use_global_stats=bn_use_global_stats,
-                    activate=False)
+                    activation=None)
             self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
@@ -199,7 +198,7 @@ class BagNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(BagNetInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
@@ -223,7 +222,7 @@ class BagNet(HybridBlock):
                 pool_size=final_pool_size,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -239,7 +238,7 @@ def get_bagnet(field,
                model_name=None,
                pretrained=False,
                ctx=cpu(),
-               root=os.path.join('~', '.mxnet', 'models'),
+               root=os.path.join("~", ".mxnet", "models"),
                **kwargs):
     """
     Create BagNet model with specific parameters.

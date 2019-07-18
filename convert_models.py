@@ -102,7 +102,7 @@ def prepare_src_model(src_fwk,
             pretrained_model_file_path=src_params_file_path,
             dtype=np.float32,
             tune_layers="",
-            classes=num_classes,
+            classes=(num_classes if num_classes > 0 else None),
             in_channels=in_channels,
             ctx=ctx)
         src_params = src_net._collect_params_with_prefix()
@@ -211,7 +211,7 @@ def prepare_dst_model(dst_fwk,
             pretrained_model_file_path="",
             dtype=np.float32,
             tune_layers="",
-            classes=num_classes,
+            classes=(num_classes if num_classes > 0 else None),
             in_channels=in_channels,
             ctx=ctx)
         dst_params = dst_net._collect_params_with_prefix()
@@ -479,6 +479,12 @@ def convert_gl2ch(dst_net,
                   ext_src_param_keys,
                   ext_src_param_keys2,
                   src_model):
+
+    if src_model.startswith("diares") or src_model.startswith("diapreres"):
+        src1 = list(filter(re.compile("^features\.[0-9]*\.\d*[1-9]\d*\.attention").search, src_param_keys))
+        src1n = [key for key in src_param_keys if key not in src1]
+        src_param_keys = src1n
+        assert (len(src_param_keys) == len(dst_param_keys))
 
     dst_param_keys = [key.replace('/W', '/weight') for key in dst_param_keys]
     dst_param_keys = [key.replace('/post_activ/', '/stageN/post_activ/') for key in dst_param_keys]
@@ -791,6 +797,16 @@ def convert_pt2pt(dst_params_file_path,
         dst1n = [key for key in dst_param_keys if key not in dst1]
         dst_param_keys = dst1 + dst1n
 
+    elif dst_model == "ntsnet":
+        src1 = list(filter(re.compile("^proposal_net").search, src_param_keys))
+        src1n = [key for key in src_param_keys if key not in src1]
+        src_param_keys = src1 + src1n
+        dst1 = list(filter(re.compile("^navigator_unit\.branch\d+\.down").search, dst_param_keys))
+        dst1n = [key for key in dst_param_keys if key not in dst1]
+        dst2 = list(filter(re.compile("^navigator_unit\.branch\d+\.tidy").search, dst1n))
+        dst2n = [key for key in dst1n if key not in dst2]
+        dst_param_keys = dst1 + dst2 + dst2n
+
     elif dst_model == "fishnet150":
         src1 = list(filter(re.compile("^(conv|fish\.fish\.[0-2])").search, src_param_keys))
         src1n = [key for key in src_param_keys if key not in src1]
@@ -980,10 +996,10 @@ def main():
         pip_packages += ["cupy-cuda92", "cupy-cuda100", "chainer"]
     if (args.src_fwk == "keras") or (args.dst_fwk == "keras"):
         packages += ["keras"]
-        pip_packages += ["keras", "keras-mxnet", "keras-applications", "keras-preprocessing"]
+        pip_packages += ["keras", "keras-mxnet", "mxnet-cu100"]
     if (args.src_fwk == "tensorflow") or (args.dst_fwk == "tensorflow"):
         packages += ["tensorflow-gpu"]
-        pip_packages += ["tensorflow-gpu", "tensorpack", "mxnet-cu100"]
+        pip_packages += ["tensorflow-gpu", "tensorpack"]
 
     _, log_file_exist = initialize_logging(
         logging_dir_path=args.save_dir,
@@ -1015,9 +1031,12 @@ def main():
         num_classes=args.dst_num_classes,
         in_channels=args.dst_in_channels)
 
-    if (args.dst_fwk in ["keras", "tensorflow"]) and any([s.find("convgroup") >= 0 for s in dst_param_keys]) or\
+    if ((args.dst_fwk in ["keras", "tensorflow"]) and any([s.find("convgroup") >= 0 for s in dst_param_keys])) or\
             ((args.src_fwk == "mxnet") and (args.src_model in ["crunet56", "crunet116", "preresnet269b"])):
         assert (len(src_param_keys) <= len(dst_param_keys))
+    elif (args.dst_fwk == "chainer") and (args.src_model.startswith("diaresnet") or
+                                          args.src_model.startswith("diapreresnet")):
+        assert (len(src_param_keys) >= len(dst_param_keys))
     else:
         assert (len(src_param_keys) == len(dst_param_keys))
 

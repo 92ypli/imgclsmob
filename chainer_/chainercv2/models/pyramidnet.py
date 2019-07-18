@@ -1,5 +1,5 @@
 """
-    PyramidNet, implemented in Chainer.
+    PyramidNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'Deep Pyramidal Residual Networks,' https://arxiv.org/abs/1610.02915.
 """
 
@@ -265,7 +265,7 @@ def get_pyramidnet(blocks,
                    alpha,
                    model_name=None,
                    pretrained=False,
-                   root=os.path.join('~', '.chainer', 'models'),
+                   root=os.path.join("~", ".chainer", "models"),
                    **kwargs):
     """
     Create PyramidNet model with specific parameters.

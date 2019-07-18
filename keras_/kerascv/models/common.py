@@ -4,8 +4,8 @@
 
 __all__ = ['is_channels_first', 'get_channel_axis', 'update_keras_shape', 'flatten', 'batchnorm', 'maxpool2d',
            'avgpool2d', 'conv2d', 'conv1x1', 'conv3x3', 'depthwise_conv3x3', 'conv_block', 'conv1x1_block',
-           'conv3x3_block', 'conv7x7_block', 'dwconv3x3_block', 'pre_conv_block', 'pre_conv1x1_block',
-           'pre_conv3x3_block', 'channel_shuffle_lambda', 'se_block']
+           'conv3x3_block', 'conv7x7_block', 'dwconv3x3_block', 'dwconv5x5_block', 'pre_conv_block',
+           'pre_conv1x1_block', 'pre_conv3x3_block', 'channel_shuffle_lambda', 'se_block']
 
 import math
 import numpy as np
@@ -13,6 +13,65 @@ from inspect import isfunction
 from keras.layers import BatchNormalization
 from keras import backend as K
 from keras import layers as nn
+
+
+def swish(x,
+          name="swish"):
+    """
+    Swish activation function from 'Searching for Activation Functions,' https://arxiv.org/abs/1710.05941.
+
+    Parameters:
+    ----------
+    x : keras.backend tensor/variable/symbol
+        Input tensor/variable/symbol.
+    name : str, default 'swish'
+        Block name.
+
+    Returns
+    -------
+    keras.backend tensor/variable/symbol
+        Resulted tensor/variable/symbol.
+    """
+    w = nn.Activation("sigmoid", name=name + "/sigmoid")(x)
+    x = nn.multiply([x, w], name=name + "/mul")
+    return x
+
+
+def get_activation_layer(x,
+                         activation,
+                         name="activ"):
+    """
+    Create activation layer from string/function.
+
+    Parameters:
+    ----------
+    x : keras.backend tensor/variable/symbol
+        Input tensor/variable/symbol.
+    activation : function or str
+        Activation function or name of activation function.
+    name : str, default 'activ'
+        Block name.
+
+    Returns
+    -------
+    keras.backend tensor/variable/symbol
+        Resulted tensor/variable/symbol.
+    """
+    assert (activation is not None)
+    if isfunction(activation):
+        x = activation()(x)
+    elif isinstance(activation, str):
+        if activation == "relu":
+            x = nn.Activation("relu", name=name)(x)
+        elif activation == "relu6":
+            x = nn.ReLU(max_value=6.0, name=name)(x)
+        elif activation == "swish":
+            x = swish(x=x, name=name)
+        else:
+            raise NotImplementedError()
+    else:
+        x = activation(x)
+    return x
 
 
 def is_channels_first():
@@ -532,11 +591,11 @@ def conv_block(x,
                dilation=1,
                groups=1,
                use_bias=False,
+               bn_epsilon=1e-5,
                activation="relu",
-               activate=True,
                name="conv_block"):
     """
-    Standard convolution block with Batch normalization and ReLU/ReLU6 activation.
+    Standard convolution block with Batch normalization and activation.
 
     Parameters:
     ----------
@@ -558,10 +617,10 @@ def conv_block(x,
         Number of groups.
     use_bias : bool, default False
         Whether the layer uses a bias vector.
+    bn_epsilon : float, default 1e-5
+        Small float added to variance in Batch norm.
     activation : function or str or None, default 'relu'
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     name : str, default 'conv_block'
         Block name.
 
@@ -583,20 +642,13 @@ def conv_block(x,
         name=name + "/conv")
     x = batchnorm(
         x=x,
+        epsilon=bn_epsilon,
         name=name + "/bn")
-    if activate:
-        assert (activation is not None)
-        if isfunction(activation):
-            x = activation()(x)
-        elif isinstance(activation, str):
-            if activation == "relu":
-                x = nn.Activation("relu", name=name + "/activ")(x)
-            elif activation == "relu6":
-                x = nn.ReLU(max_value=6.0, name=name + "/activ")(x)
-            else:
-                raise NotImplementedError()
-        else:
-            x = activation(x)
+    if activation is not None:
+        x = get_activation_layer(
+            x=x,
+            activation=activation,
+            name=name + "/activ")
     return x
 
 
@@ -606,8 +658,8 @@ def conv1x1_block(x,
                   strides=1,
                   groups=1,
                   use_bias=False,
+                  bn_epsilon=1e-5,
                   activation="relu",
-                  activate=True,
                   name="conv1x1_block"):
     """
     1x1 version of the standard convolution block.
@@ -626,10 +678,10 @@ def conv1x1_block(x,
         Number of groups.
     use_bias : bool, default False
         Whether the layer uses a bias vector.
+    bn_epsilon : float, default 1e-5
+        Small float added to variance in Batch norm.
     activation : function or str or None, default 'relu'
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     name : str, default 'conv1x1_block'
         Block name.
 
@@ -647,8 +699,8 @@ def conv1x1_block(x,
         padding=0,
         groups=groups,
         use_bias=use_bias,
+        bn_epsilon=bn_epsilon,
         activation=activation,
-        activate=activate,
         name=name)
 
 
@@ -660,8 +712,8 @@ def conv3x3_block(x,
                   dilation=1,
                   groups=1,
                   use_bias=False,
+                  bn_epsilon=1e-5,
                   activation="relu",
-                  activate=True,
                   name="conv3x3_block"):
     """
     3x3 version of the standard convolution block.
@@ -684,10 +736,10 @@ def conv3x3_block(x,
         Number of groups.
     use_bias : bool, default False
         Whether the layer uses a bias vector.
+    bn_epsilon : float, default 1e-5
+        Small float added to variance in Batch norm.
     activation : function or str or None, default 'relu'
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     name : str, default 'conv3x3_block'
         Block name.
 
@@ -706,8 +758,67 @@ def conv3x3_block(x,
         dilation=dilation,
         groups=groups,
         use_bias=use_bias,
+        bn_epsilon=bn_epsilon,
         activation=activation,
-        activate=activate,
+        name=name)
+
+
+def conv5x5_block(x,
+                  in_channels,
+                  out_channels,
+                  strides=1,
+                  padding=2,
+                  dilation=1,
+                  groups=1,
+                  use_bias=False,
+                  bn_epsilon=1e-5,
+                  activation="relu",
+                  name="conv3x3_block"):
+    """
+    5x5 version of the standard convolution block.
+
+    Parameters:
+    ----------
+    x : keras.backend tensor/variable/symbol
+        Input tensor/variable/symbol.
+    in_channels : int
+        Number of input channels.
+    out_channels : int
+        Number of output channels.
+    strides : int or tuple/list of 2 int, default 1
+        Strides of the convolution.
+    padding : int or tuple/list of 2 int, default 2
+        Padding value for convolution layer.
+    dilation : int or tuple/list of 2 int, default 1
+        Dilation value for convolution layer.
+    groups : int, default 1
+        Number of groups.
+    use_bias : bool, default False
+        Whether the layer uses a bias vector.
+    bn_epsilon : float, default 1e-5
+        Small float added to variance in Batch norm.
+    activation : function or str or None, default 'relu'
+        Activation function or name of activation function.
+    name : str, default 'conv3x3_block'
+        Block name.
+
+    Returns
+    -------
+    keras.backend tensor/variable/symbol
+        Resulted tensor/variable/symbol.
+    """
+    return conv_block(
+        x=x,
+        in_channels=in_channels,
+        out_channels=out_channels,
+        kernel_size=5,
+        strides=strides,
+        padding=padding,
+        dilation=dilation,
+        groups=groups,
+        use_bias=use_bias,
+        bn_epsilon=bn_epsilon,
+        activation=activation,
         name=name)
 
 
@@ -718,7 +829,6 @@ def conv7x7_block(x,
                   padding=3,
                   use_bias=False,
                   activation="relu",
-                  activate=True,
                   name="conv7x7_block"):
     """
     3x3 version of the standard convolution block.
@@ -739,8 +849,6 @@ def conv7x7_block(x,
         Whether the layer uses a bias vector.
     activation : function or str or None, default 'relu'
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     name : str, default 'conv7x7_block'
         Block name.
 
@@ -758,22 +866,21 @@ def conv7x7_block(x,
         padding=padding,
         use_bias=use_bias,
         activation=activation,
-        activate=activate,
         name=name)
 
 
 def dwconv3x3_block(x,
                     in_channels,
                     out_channels,
-                    strides,
+                    strides=1,
                     padding=1,
                     dilation=1,
                     use_bias=False,
+                    bn_epsilon=1e-5,
                     activation="relu",
-                    activate=True,
                     name="dwconv3x3_block"):
     """
-    3x3 depthwise version of the standard convolution block with ReLU6 activation.
+    3x3 depthwise version of the standard convolution block.
 
     Parameters:
     ----------
@@ -783,7 +890,7 @@ def dwconv3x3_block(x,
         Number of input channels.
     out_channels : int
         Number of output channels.
-    strides : int or tuple/list of 2 int
+    strides : int or tuple/list of 2 int, default 1
         Strides of the convolution.
     padding : int or tuple/list of 2 int, default 1
         Padding value for convolution layer.
@@ -791,10 +898,10 @@ def dwconv3x3_block(x,
         Dilation value for convolution layer.
     use_bias : bool, default False
         Whether the layer uses a bias vector.
+    bn_epsilon : float, default 1e-5
+        Small float added to variance in Batch norm.
     activation : function or str or None, default 'relu'
         Activation function or name of activation function.
-    activate : bool, default True
-        Whether activate the convolution block.
     name : str, default 'dwconv3x3_block'
         Block name.
 
@@ -812,8 +919,63 @@ def dwconv3x3_block(x,
         dilation=dilation,
         groups=out_channels,
         use_bias=use_bias,
+        bn_epsilon=bn_epsilon,
         activation=activation,
-        activate=activate,
+        name=name)
+
+
+def dwconv5x5_block(x,
+                    in_channels,
+                    out_channels,
+                    strides=1,
+                    padding=2,
+                    dilation=1,
+                    use_bias=False,
+                    bn_epsilon=1e-5,
+                    activation="relu",
+                    name="dwconv3x3_block"):
+    """
+    5x5 depthwise version of the standard convolution block.
+
+    Parameters:
+    ----------
+    x : keras.backend tensor/variable/symbol
+        Input tensor/variable/symbol.
+    in_channels : int
+        Number of input channels.
+    out_channels : int
+        Number of output channels.
+    strides : int or tuple/list of 2 int, default 1
+        Strides of the convolution.
+    padding : int or tuple/list of 2 int, default 2
+        Padding value for convolution layer.
+    dilation : int or tuple/list of 2 int, default 1
+        Dilation value for convolution layer.
+    use_bias : bool, default False
+        Whether the layer uses a bias vector.
+    bn_epsilon : float, default 1e-5
+        Small float added to variance in Batch norm.
+    activation : function or str or None, default 'relu'
+        Activation function or name of activation function.
+    name : str, default 'dwconv3x3_block'
+        Block name.
+
+    Returns
+    -------
+    keras.backend tensor/variable/symbol
+        Resulted tensor/variable/symbol.
+    """
+    return conv5x5_block(
+        x=x,
+        in_channels=in_channels,
+        out_channels=out_channels,
+        strides=strides,
+        padding=padding,
+        dilation=dilation,
+        groups=out_channels,
+        use_bias=use_bias,
+        bn_epsilon=bn_epsilon,
+        activation=activation,
         name=name)
 
 
@@ -1019,6 +1181,7 @@ def channel_shuffle_lambda(channels,
 def se_block(x,
              channels,
              reduction=16,
+             activation="relu",
              name="se_block"):
     """
     Squeeze-and-Excitation block from 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
@@ -1031,6 +1194,8 @@ def se_block(x,
         Number of channels.
     reduction : int, default 16
         Squeeze reduction value.
+    activation : function or str, default 'relu'
+        Activation function or name of activation function.
     name : str, default 'se_block'
         Block name.
 
@@ -1052,7 +1217,10 @@ def se_block(x,
         out_channels=mid_cannels,
         use_bias=True,
         name=name + "/conv1")
-    w = nn.Activation("relu", name=name + "/relu")(w)
+    w = get_activation_layer(
+        x=w,
+        activation=activation,
+        name=name + "/activ")
     w = conv1x1(
         x=w,
         in_channels=mid_cannels,

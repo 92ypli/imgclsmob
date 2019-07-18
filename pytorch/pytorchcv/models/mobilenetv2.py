@@ -1,5 +1,5 @@
 """
-    MobileNetV2, implemented in PyTorch.
+    MobileNetV2 for ImageNet-1K, implemented in PyTorch.
     Original paper: 'MobileNetV2: Inverted Residuals and Linear Bottlenecks,' https://arxiv.org/abs/1801.04381.
 """
 
@@ -47,8 +47,7 @@ class LinearBottleneck(nn.Module):
         self.conv3 = conv1x1_block(
             in_channels=mid_channels,
             out_channels=out_channels,
-            activation=None,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         if self.residual:
@@ -143,7 +142,7 @@ class MobileNetV2(nn.Module):
 def get_mobilenetv2(width_scale,
                     model_name=None,
                     pretrained=False,
-                    root=os.path.join('~', '.torch', 'models'),
+                    root=os.path.join("~", ".torch", "models"),
                     **kwargs):
     """
     Create MobileNetV2 model with specific parameters.
@@ -267,7 +266,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -291,7 +289,7 @@ def _test():
         assert (model != mobilenetv2_wd2 or weight_count == 1964736)
         assert (model != mobilenetv2_wd4 or weight_count == 1516392)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

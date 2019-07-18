@@ -1,5 +1,5 @@
 """
-    SparseNet, implemented in Chainer.
+    SparseNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'Sparsely Aggregated Convolutional Networks,' https://arxiv.org/abs/1801.05895.
 """
 
@@ -44,7 +44,7 @@ class SparseBlock(Chain):
         Number of input channels.
     out_channels : int
         Number of output channels.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     """
     def __init__(self,
@@ -88,7 +88,7 @@ class SparseStage(Chain):
         Number of output channels for each unit in stage.
     growth_rate : int
         Growth rate for blocks.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     do_transition : bool
         Whether use transition block.
@@ -203,7 +203,7 @@ class SparseNet(Chain):
 def get_sparsenet(num_layers,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.chainer', 'models'),
+                  root=os.path.join("~", ".chainer", "models"),
                   **kwargs):
     """
     Create SparseNet model with specific parameters.

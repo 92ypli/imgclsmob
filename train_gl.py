@@ -2,8 +2,8 @@ import argparse
 import time
 import logging
 import os
-import numpy as np
 import random
+import numpy as np
 
 import mxnet as mx
 from mxnet import gluon
@@ -13,227 +13,249 @@ from common.logger_utils import initialize_logging
 from common.train_log_param_saver import TrainLogParamSaver
 from gluon.lr_scheduler import LRScheduler
 from gluon.utils import prepare_mx_context, prepare_model, validate
+from gluon.utils import report_accuracy, get_composite_metric, get_metric_name
 
-from gluon.imagenet1k import add_dataset_parser_arguments
-from gluon.imagenet1k import get_batch_fn
-from gluon.imagenet1k import get_train_data_source
-from gluon.imagenet1k import get_val_data_source
-from gluon.imagenet1k import num_training_samples
+from gluon.dataset_utils import get_dataset_metainfo
+from gluon.dataset_utils import get_train_data_source, get_val_data_source
+from gluon.dataset_utils import get_batch_fn
+
+
+def add_train_cls_parser_arguments(parser):
+    parser.add_argument(
+        "--model",
+        type=str,
+        required=True,
+        help="type of model to use. see model_provider for options")
+    parser.add_argument(
+        "--use-pretrained",
+        action="store_true",
+        help="enable using pretrained model from github repo")
+    parser.add_argument(
+        "--dtype",
+        type=str,
+        default="float32",
+        help="data type for training")
+    parser.add_argument(
+        '--not-hybridize',
+        action='store_true',
+        help='do not hybridize model')
+    parser.add_argument(
+        "--resume",
+        type=str,
+        default="",
+        help="resume from previously saved parameters if not None")
+    parser.add_argument(
+        "--resume-state",
+        type=str,
+        default="",
+        help="resume from previously saved optimizer state if not None")
+
+    parser.add_argument(
+        "--num-gpus",
+        type=int,
+        default=0,
+        help="number of gpus to use")
+    parser.add_argument(
+        "-j",
+        "--num-data-workers",
+        dest="num_workers",
+        default=4,
+        type=int,
+        help="number of preprocessing workers")
+
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=512,
+        help="training batch size per device (CPU/GPU)")
+    parser.add_argument(
+        "--batch-size-scale",
+        type=int,
+        default=1,
+        help="manual batch-size increasing factor")
+    parser.add_argument(
+        "--num-epochs",
+        type=int,
+        default=120,
+        help="number of training epochs")
+    parser.add_argument(
+        "--start-epoch",
+        type=int,
+        default=1,
+        help="starting epoch for resuming, default is 1 for new training")
+    parser.add_argument(
+        "--attempt",
+        type=int,
+        default=1,
+        help="current attempt number for training")
+
+    parser.add_argument(
+        "--optimizer-name",
+        type=str,
+        default="nag",
+        help="optimizer name")
+    parser.add_argument(
+        "--lr",
+        type=float,
+        default=0.1,
+        help="learning rate")
+    parser.add_argument(
+        "--lr-mode",
+        type=str,
+        default="cosine",
+        help="learning rate scheduler mode. options are step, poly and cosine")
+    parser.add_argument(
+        "--lr-decay",
+        type=float,
+        default=0.1,
+        help="decay rate of learning rate")
+    parser.add_argument(
+        "--lr-decay-period",
+        type=int,
+        default=0,
+        help="interval for periodic learning rate decays. default is 0 to disable")
+    parser.add_argument(
+        "--lr-decay-epoch",
+        type=str,
+        default="40,60",
+        help="epoches at which learning rate decays")
+    parser.add_argument(
+        "--target-lr",
+        type=float,
+        default=1e-8,
+        help="ending learning rate")
+    parser.add_argument(
+        "--poly-power",
+        type=float,
+        default=2,
+        help="power value for poly LR scheduler")
+    parser.add_argument(
+        "--warmup-epochs",
+        type=int,
+        default=0,
+        help="number of warmup epochs")
+    parser.add_argument(
+        "--warmup-lr",
+        type=float,
+        default=1e-8,
+        help="starting warmup learning rate")
+    parser.add_argument(
+        "--warmup-mode",
+        type=str,
+        default="linear",
+        help="learning rate scheduler warmup mode. options are linear, poly and constant")
+    parser.add_argument(
+        "--momentum",
+        type=float,
+        default=0.9,
+        help="momentum value for optimizer")
+    parser.add_argument(
+        "--wd",
+        type=float,
+        default=0.0001,
+        help="weight decay rate")
+    parser.add_argument(
+        "--gamma-wd-mult",
+        type=float,
+        default=1.0,
+        help="weight decay multiplier for batchnorm gamma")
+    parser.add_argument(
+        "--beta-wd-mult",
+        type=float,
+        default=1.0,
+        help="weight decay multiplier for batchnorm beta")
+    parser.add_argument(
+        "--bias-wd-mult",
+        type=float,
+        default=1.0,
+        help="weight decay multiplier for bias")
+    parser.add_argument(
+        "--grad-clip",
+        type=float,
+        default=None,
+        help="max_norm for gradient clipping")
+    parser.add_argument(
+        "--label-smoothing",
+        action="store_true",
+        help="use label smoothing")
+
+    parser.add_argument(
+        "--mixup",
+        action="store_true",
+        help="use mixup strategy")
+    parser.add_argument(
+        "--mixup-epoch-tail",
+        type=int,
+        default=20,
+        help="number of epochs without mixup at the end of training")
+
+    parser.add_argument(
+        "--log-interval",
+        type=int,
+        default=50,
+        help="number of batches to wait before logging")
+    parser.add_argument(
+        "--save-interval",
+        type=int,
+        default=4,
+        help="saving parameters epoch interval, best model will always be saved")
+    parser.add_argument(
+        "--save-dir",
+        type=str,
+        default="",
+        help="directory of saved models and log-files")
+    parser.add_argument(
+        "--logging-file-name",
+        type=str,
+        default="train.log",
+        help="filename of training log")
+
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=-1,
+        help="random seed to be fixed")
+    parser.add_argument(
+        "--log-packages",
+        type=str,
+        default="mxnet, numpy",
+        help="list of python packages for logging")
+    parser.add_argument(
+        "--log-pip-packages",
+        type=str,
+        default="mxnet-cu100",
+        help="list of pip packages for logging")
+
+    parser.add_argument(
+        "--tune-layers",
+        type=str,
+        default="",
+        help="regexp for selecting layers for fine tuning")
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Train a model for image classification (Gluon/ImageNet-1K)',
+        description="Train a model for image classification (Gluon)",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="ImageNet1K_rec",
+        help="dataset name. options are ImageNet1K, ImageNet1K_rec, CUB200_2011, CIFAR10, CIFAR100, SVHN")
+    parser.add_argument(
+        "--work-dir",
+        type=str,
+        default=os.path.join("..", "imgclsmob_data"),
+        help="path to working directory only for dataset root path preset")
 
-    add_dataset_parser_arguments(parser)
+    args, _ = parser.parse_known_args()
+    dataset_metainfo = get_dataset_metainfo(dataset_name=args.dataset)
+    dataset_metainfo.add_dataset_parser_arguments(
+        parser=parser,
+        work_dir_path=args.work_dir)
 
-    parser.add_argument(
-        '--model',
-        type=str,
-        required=True,
-        help='type of model to use. see model_provider for options.')
-    parser.add_argument(
-        '--use-pretrained',
-        action='store_true',
-        help='enable using pretrained model from gluon.')
-    parser.add_argument(
-        '--dtype',
-        type=str,
-        default='float32',
-        help='data type for training')
-    parser.add_argument(
-        '--resume',
-        type=str,
-        default='',
-        help='resume from previously saved parameters if not None')
-    parser.add_argument(
-        '--resume-state',
-        type=str,
-        default='',
-        help='resume from previously saved optimizer state if not None')
+    add_train_cls_parser_arguments(parser)
 
-    parser.add_argument(
-        '--num-gpus',
-        type=int,
-        default=0,
-        help='number of gpus to use.')
-    parser.add_argument(
-        '-j',
-        '--num-data-workers',
-        dest='num_workers',
-        default=4,
-        type=int,
-        help='number of preprocessing workers')
-
-    parser.add_argument(
-        '--batch-size',
-        type=int,
-        default=512,
-        help='training batch size per device (CPU/GPU).')
-    parser.add_argument(
-        '--batch-size-scale',
-        type=int,
-        default=1,
-        help='manual batch-size increasing factor.')
-    parser.add_argument(
-        '--num-epochs',
-        type=int,
-        default=120,
-        help='number of training epochs.')
-    parser.add_argument(
-        '--start-epoch',
-        type=int,
-        default=1,
-        help='starting epoch for resuming, default is 1 for new training')
-    parser.add_argument(
-        '--attempt',
-        type=int,
-        default=1,
-        help='current number of training')
-
-    parser.add_argument(
-        '--optimizer-name',
-        type=str,
-        default='nag',
-        help='optimizer name')
-    parser.add_argument(
-        '--lr',
-        type=float,
-        default=0.1,
-        help='learning rate')
-    parser.add_argument(
-        '--lr-mode',
-        type=str,
-        default='cosine',
-        help='learning rate scheduler mode. options are step, poly and cosine')
-    parser.add_argument(
-        '--lr-decay',
-        type=float,
-        default=0.1,
-        help='decay rate of learning rate')
-    parser.add_argument(
-        '--lr-decay-period',
-        type=int,
-        default=0,
-        help='interval for periodic learning rate decays. default is 0 to disable.')
-    parser.add_argument(
-        '--lr-decay-epoch',
-        type=str,
-        default='40,60',
-        help='epoches at which learning rate decays')
-    parser.add_argument(
-        '--target-lr',
-        type=float,
-        default=1e-8,
-        help='ending learning rate')
-    parser.add_argument(
-        '--poly-power',
-        type=float,
-        default=2,
-        help='power value for poly LR scheduler')
-    parser.add_argument(
-        '--warmup-epochs',
-        type=int,
-        default=0,
-        help='number of warmup epochs.')
-    parser.add_argument(
-        '--warmup-lr',
-        type=float,
-        default=1e-8,
-        help='starting warmup learning rate')
-    parser.add_argument(
-        '--warmup-mode',
-        type=str,
-        default='linear',
-        help='learning rate scheduler warmup mode. options are linear, poly and constant')
-    parser.add_argument(
-        '--momentum',
-        type=float,
-        default=0.9,
-        help='momentum value for optimizer')
-    parser.add_argument(
-        '--wd',
-        type=float,
-        default=0.0001,
-        help='weight decay rate')
-    parser.add_argument(
-        '--gamma-wd-mult',
-        type=float,
-        default=1.0,
-        help='weight decay multiplier for batchnorm gamma')
-    parser.add_argument(
-        '--beta-wd-mult',
-        type=float,
-        default=1.0,
-        help='weight decay multiplier for batchnorm beta')
-    parser.add_argument(
-        '--bias-wd-mult',
-        type=float,
-        default=1.0,
-        help='weight decay multiplier for bias')
-    parser.add_argument(
-        '--grad-clip',
-        type=float,
-        default=None,
-        help='max_norm for gradient clipping')
-    parser.add_argument(
-        '--label-smoothing',
-        action='store_true',
-        help='use label smoothing')
-
-    parser.add_argument(
-        '--mixup',
-        action='store_true',
-        help='use mixup strategy')
-    parser.add_argument(
-        '--mixup-epoch-tail',
-        type=int,
-        default=20,
-        help='number of epochs without mixup at the end of training')
-
-    parser.add_argument(
-        '--log-interval',
-        type=int,
-        default=50,
-        help='number of batches to wait before logging.')
-    parser.add_argument(
-        '--save-interval',
-        type=int,
-        default=4,
-        help='saving parameters epoch interval, best model will always be saved')
-    parser.add_argument(
-        '--save-dir',
-        type=str,
-        default='',
-        help='directory of saved models and log-files')
-    parser.add_argument(
-        '--logging-file-name',
-        type=str,
-        default='train.log',
-        help='filename of training log')
-
-    parser.add_argument(
-        '--seed',
-        type=int,
-        default=-1,
-        help='Random seed to be fixed')
-    parser.add_argument(
-        '--log-packages',
-        type=str,
-        default='mxnet',
-        help='list of python packages for logging')
-    parser.add_argument(
-        '--log-pip-packages',
-        type=str,
-        default='mxnet-cu100',
-        help='list of pip packages for logging')
-
-    parser.add_argument(
-        '--tune-layers',
-        type=str,
-        default='',
-        help='Regexp for selecting layers for fine tuning')
     args = parser.parse_args()
     return args
 
@@ -271,21 +293,21 @@ def prepare_trainer(net,
                     state_file_path=None):
 
     if gamma_wd_mult != 1.0:
-        for k, v in net.collect_params('.*gamma').items():
+        for k, v in net.collect_params(".*gamma").items():
             v.wd_mult = gamma_wd_mult
 
     if beta_wd_mult != 1.0:
-        for k, v in net.collect_params('.*beta').items():
+        for k, v in net.collect_params(".*beta").items():
             v.wd_mult = beta_wd_mult
 
     if bias_wd_mult != 1.0:
-        for k, v in net.collect_params('.*bias').items():
+        for k, v in net.collect_params(".*bias").items():
             v.wd_mult = bias_wd_mult
 
     if lr_decay_period > 0:
         lr_decay_epoch = list(range(lr_decay_period, num_epochs, lr_decay_period))
     else:
-        lr_decay_epoch = [int(i) for i in lr_decay_epoch.split(',')]
+        lr_decay_epoch = [int(i) for i in lr_decay_epoch.split(",")]
     num_batches = num_training_samples // batch_size
     lr_scheduler = LRScheduler(
         mode=lr_mode,
@@ -300,12 +322,12 @@ def prepare_trainer(net,
         warmup_lr=warmup_lr,
         warmup_mode=warmup_mode)
 
-    optimizer_params = {'learning_rate': lr,
-                        'wd': wd,
-                        'momentum': momentum,
-                        'lr_scheduler': lr_scheduler}
-    if dtype != 'float32':
-        optimizer_params['multi_precision'] = True
+    optimizer_params = {"learning_rate": lr,
+                        "wd": wd,
+                        "momentum": momentum,
+                        "lr_scheduler": lr_scheduler}
+    if dtype != "float32":
+        optimizer_params["multi_precision"] = True
 
     trainer = gluon.Trainer(
         params=net.collect_params(),
@@ -313,11 +335,11 @@ def prepare_trainer(net,
         optimizer_params=optimizer_params)
 
     if (state_file_path is not None) and state_file_path and os.path.exists(state_file_path):
-        logging.info('Loading trainer states: {}'.format(state_file_path))
+        logging.info("Loading trainer states: {}".format(state_file_path))
         trainer.load_states(state_file_path)
         if trainer._optimizer.wd != wd:
             trainer._optimizer.wd = wd
-            logging.info('Reset the weight decay: {}'.format(wd))
+            logging.info("Reset the weight decay: {}".format(wd))
         # lr_scheduler = trainer._optimizer.lr_scheduler
         trainer._optimizer.lr_scheduler = lr_scheduler
 
@@ -327,13 +349,13 @@ def prepare_trainer(net,
 def save_params(file_stem,
                 net,
                 trainer):
-    net.save_parameters(file_stem + '.params')
-    trainer.save_states(file_stem + '.states')
+    net.save_parameters(file_stem + ".params")
+    trainer.save_states(file_stem + ".states")
 
 
 def train_epoch(epoch,
                 net,
-                acc_top1_train,
+                train_metric,
                 train_data,
                 batch_fn,
                 data_source_needs_reset,
@@ -357,27 +379,28 @@ def train_epoch(epoch,
     tic = time.time()
     if data_source_needs_reset:
         train_data.reset()
-    acc_top1_train.reset()
+    train_metric.reset()
     train_loss = 0.0
 
     btic = time.time()
     for i, batch in enumerate(train_data):
         data_list, labels_list = batch_fn(batch, ctx)
 
-        if mixup:
-            labels_list_inds = labels_list
-            labels_list = [Y.one_hot(depth=num_classes) for Y in labels_list]
-            if epoch < num_epochs - mixup_epoch_tail:
-                alpha = 1
-                lam = np.random.beta(alpha, alpha)
-                data_list = [lam * X + (1 - lam) * X[::-1] for X in data_list]
-                labels_list = [lam * Y + (1 - lam) * Y[::-1] for Y in labels_list]
-        elif label_smoothing:
+        if label_smoothing:
             eta = 0.1
             on_value = 1 - eta + eta / num_classes
             off_value = eta / num_classes
             labels_list_inds = labels_list
             labels_list = [Y.one_hot(depth=num_classes, on_value=on_value, off_value=off_value) for Y in labels_list]
+        if mixup:
+            if not label_smoothing:
+                labels_list_inds = labels_list
+                labels_list = [Y.one_hot(depth=num_classes) for Y in labels_list]
+            if epoch < num_epochs - mixup_epoch_tail:
+                alpha = 1
+                lam = np.random.beta(alpha, alpha)
+                data_list = [lam * X + (1 - lam) * X[::-1] for X in data_list]
+                labels_list = [lam * Y + (1 - lam) * Y[::-1] for Y in labels_list]
 
         with ag.record():
             outputs_list = [net(X.astype(dtype, copy=False)) for X in data_list]
@@ -403,17 +426,16 @@ def train_epoch(epoch,
 
         train_loss += sum([loss.mean().asscalar() for loss in loss_list]) / len(loss_list)
 
-        acc_top1_train.update(
+        train_metric.update(
             labels=(labels_list if not (mixup or label_smoothing) else labels_list_inds),
             preds=outputs_list)
 
         if log_interval and not (i + 1) % log_interval:
             speed = batch_size * log_interval / (time.time() - btic)
             btic = time.time()
-            _, top1 = acc_top1_train.get()
-            err_top1_train = 1.0 - top1
-            logging.info('Epoch[{}] Batch [{}]\tSpeed: {:.2f} samples/sec\ttop1-err={:.4f}\tlr={:.5f}'.format(
-                epoch + 1, i, speed, err_top1_train, trainer.learning_rate))
+            train_accuracy_msg = report_accuracy(metric=train_metric)
+            logging.info("Epoch[{}] Batch [{}]\tSpeed: {:.2f} samples/sec\t{}\tlr={:.5f}".format(
+                epoch + 1, i, speed, train_accuracy_msg, trainer.learning_rate))
 
     if (batch_size_scale != 1) and (batch_size_extend_count > 0):
         trainer.step(batch_size * batch_size_extend_count)
@@ -421,16 +443,15 @@ def train_epoch(epoch,
             p.zero_grad()
 
     throughput = int(batch_size * (i + 1) / (time.time() - tic))
-    logging.info('[Epoch {}] speed: {:.2f} samples/sec\ttime cost: {:.2f} sec'.format(
+    logging.info("[Epoch {}] speed: {:.2f} samples/sec\ttime cost: {:.2f} sec".format(
         epoch + 1, throughput, time.time() - tic))
 
     train_loss /= (i + 1)
-    _, top1 = acc_top1_train.get()
-    err_top1_train = 1.0 - top1
-    logging.info('[Epoch {}] training: err-top1={:.4f}\tloss={:.4f}'.format(
-        epoch + 1, err_top1_train, train_loss))
+    train_accuracy_msg = report_accuracy(metric=train_metric)
+    logging.info("[Epoch {}] training: {}\tloss={:.4f}".format(
+        epoch + 1, train_accuracy_msg, train_loss))
 
-    return err_top1_train, train_loss
+    return train_loss
 
 
 def train_net(batch_size,
@@ -452,45 +473,40 @@ def train_net(batch_size,
               num_classes,
               grad_clip_value,
               batch_size_scale,
+              val_metric,
+              train_metric,
               ctx):
-
-    assert (not (mixup and label_smoothing))
 
     if batch_size_scale != 1:
         for p in net.collect_params().values():
-            p.grad_req = 'add'
+            p.grad_req = "add"
 
     if isinstance(ctx, mx.Context):
         ctx = [ctx]
-
-    acc_top1_val = mx.metric.Accuracy()
-    acc_top5_val = mx.metric.TopKAccuracy(5)
-    acc_top1_train = mx.metric.Accuracy()
 
     loss_func = gluon.loss.SoftmaxCrossEntropyLoss(sparse_label=(not (mixup or label_smoothing)))
 
     assert (type(start_epoch1) == int)
     assert (start_epoch1 >= 1)
     if start_epoch1 > 1:
-        logging.info('Start training from [Epoch {}]'.format(start_epoch1))
-        err_top1_val, err_top5_val = validate(
-            acc_top1=acc_top1_val,
-            acc_top5=acc_top5_val,
+        logging.info("Start training from [Epoch {}]".format(start_epoch1))
+        validate(
+            metric=val_metric,
             net=net,
             val_data=val_data,
             batch_fn=batch_fn,
             data_source_needs_reset=data_source_needs_reset,
             dtype=dtype,
             ctx=ctx)
-        logging.info('[Epoch {}] validation: err-top1={:.4f}\terr-top5={:.4f}'.format(
-            start_epoch1 - 1, err_top1_val, err_top5_val))
+        val_accuracy_msg = report_accuracy(metric=val_metric)
+        logging.info("[Epoch {}] validation: {}".format(start_epoch1 - 1, val_accuracy_msg))
 
     gtic = time.time()
     for epoch in range(start_epoch1 - 1, num_epochs):
-        err_top1_train, train_loss = train_epoch(
+        train_loss = train_epoch(
             epoch=epoch,
             net=net,
-            acc_top1_train=acc_top1_train,
+            train_metric=train_metric,
             train_data=train_data,
             batch_fn=batch_fn,
             data_source_needs_reset=data_source_needs_reset,
@@ -509,30 +525,33 @@ def train_net(batch_size,
             grad_clip_value=grad_clip_value,
             batch_size_scale=batch_size_scale)
 
-        err_top1_val, err_top5_val = validate(
-            acc_top1=acc_top1_val,
-            acc_top5=acc_top5_val,
+        validate(
+            metric=val_metric,
             net=net,
             val_data=val_data,
             batch_fn=batch_fn,
             data_source_needs_reset=data_source_needs_reset,
             dtype=dtype,
             ctx=ctx)
-
-        logging.info('[Epoch {}] validation: err-top1={:.4f}\terr-top5={:.4f}'.format(
-            epoch + 1, err_top1_val, err_top5_val))
+        val_accuracy_msg = report_accuracy(metric=val_metric)
+        logging.info("[Epoch {}] validation: {}".format(epoch + 1, val_accuracy_msg))
 
         if lp_saver is not None:
-            lp_saver_kwargs = {'net': net, 'trainer': trainer}
+            lp_saver_kwargs = {"net": net, "trainer": trainer}
+            val_acc_values = val_metric.get()[1]
+            train_acc_values = train_metric.get()[1]
+            val_acc_values = val_acc_values if type(val_acc_values) == list else [val_acc_values]
+            train_acc_values = train_acc_values if type(train_acc_values) == list else [train_acc_values]
             lp_saver.epoch_test_end_callback(
                 epoch1=(epoch + 1),
-                params=[err_top1_val, err_top1_train, err_top5_val, train_loss, trainer.learning_rate],
+                params=(val_acc_values + train_acc_values + [train_loss, trainer.learning_rate]),
                 **lp_saver_kwargs)
 
-    logging.info('Total time cost: {:.2f} sec'.format(time.time() - gtic))
+    logging.info("Total time cost: {:.2f} sec".format(time.time() - gtic))
     if lp_saver is not None:
-        logging.info('Best err-top5: {:.4f} at {} epoch'.format(
-            lp_saver.best_eval_metric_value, lp_saver.best_eval_metric_epoch))
+        opt_metric_name = get_metric_name(val_metric, lp_saver.acc_ind)
+        logging.info("Best {}: {:.4f} at {} epoch".format(
+            opt_metric_name, lp_saver.best_eval_metric_value, lp_saver.best_eval_metric_epoch))
 
 
 def main():
@@ -558,27 +577,25 @@ def main():
         tune_layers=args.tune_layers,
         classes=args.num_classes,
         in_channels=args.in_channels,
+        do_hybridize=(not args.not_hybridize),
         ctx=ctx)
+    assert (hasattr(net, "classes"))
+    num_classes = net.classes
 
-    assert (hasattr(net, 'classes'))
-    assert (hasattr(net, 'in_size'))
-    num_classes = net.classes if hasattr(net, 'classes') else 1000
-    input_image_size = net.in_size if hasattr(net, 'in_size') else (args.input_size, args.input_size)
+    ds_metainfo = get_dataset_metainfo(dataset_name=args.dataset)
+    ds_metainfo.update(args=args)
 
     train_data = get_train_data_source(
-        dataset_args=args,
+        ds_metainfo=ds_metainfo,
         batch_size=batch_size,
-        num_workers=args.num_workers,
-        input_image_size=input_image_size)
+        num_workers=args.num_workers)
     val_data = get_val_data_source(
-        dataset_args=args,
+        ds_metainfo=ds_metainfo,
         batch_size=batch_size,
-        num_workers=args.num_workers,
-        input_image_size=input_image_size,
-        resize_inv_factor=args.resize_inv_factor)
-    batch_fn = get_batch_fn(dataset_args=args)
-    data_source_needs_reset = args.use_rec
+        num_workers=args.num_workers)
+    batch_fn = get_batch_fn(use_imgrec=ds_metainfo.use_imgrec)
 
+    num_training_samples = len(train_data._dataset) if not ds_metainfo.use_imgrec else ds_metainfo.num_training_samples
     trainer, lr_scheduler = prepare_trainer(
         net=net,
         optimizer_name=args.optimizer_name,
@@ -604,8 +621,9 @@ def main():
         state_file_path=args.resume_state)
 
     if args.save_dir and args.save_interval:
+        param_names = ds_metainfo.val_metric_capts + ds_metainfo.train_metric_capts + ["Train.Loss", "LR"]
         lp_saver = TrainLogParamSaver(
-            checkpoint_file_name_prefix='imagenet_{}'.format(args.model),
+            checkpoint_file_name_prefix="{}_{}".format(ds_metainfo.short_label, args.model),
             last_checkpoint_file_name_suffix="last",
             best_checkpoint_file_name_suffix=None,
             last_checkpoint_dir_path=args.save_dir,
@@ -613,16 +631,16 @@ def main():
             last_checkpoint_file_count=2,
             best_checkpoint_file_count=2,
             checkpoint_file_save_callback=save_params,
-            checkpoint_file_exts=('.params', '.states'),
+            checkpoint_file_exts=(".params", ".states"),
             save_interval=args.save_interval,
             num_epochs=args.num_epochs,
-            param_names=['Val.Top1', 'Train.Top1', 'Val.Top5', 'Train.Loss', 'LR'],
-            acc_ind=2,
+            param_names=param_names,
+            acc_ind=ds_metainfo.saver_acc_ind,
             # bigger=[True],
             # mask=None,
-            score_log_file_path=os.path.join(args.save_dir, 'score.log'),
+            score_log_file_path=os.path.join(args.save_dir, "score.log"),
             score_log_attempt_value=args.attempt,
-            best_map_log_file_path=os.path.join(args.save_dir, 'best_map.log'))
+            best_map_log_file_path=os.path.join(args.save_dir, "best_map.log"))
     else:
         lp_saver = None
 
@@ -633,7 +651,7 @@ def main():
         train_data=train_data,
         val_data=val_data,
         batch_fn=batch_fn,
-        data_source_needs_reset=data_source_needs_reset,
+        data_source_needs_reset=ds_metainfo.use_imgrec,
         dtype=args.dtype,
         net=net,
         trainer=trainer,
@@ -646,8 +664,10 @@ def main():
         num_classes=num_classes,
         grad_clip_value=args.grad_clip,
         batch_size_scale=args.batch_size_scale,
+        val_metric=get_composite_metric(ds_metainfo.val_metric_names, ds_metainfo.val_metric_extra_kwargs),
+        train_metric=get_composite_metric(ds_metainfo.train_metric_names, ds_metainfo.train_metric_extra_kwargs),
         ctx=ctx)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

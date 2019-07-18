@@ -1,5 +1,5 @@
 """
-    DPN, implemented in Chainer.
+    DPN for ImageNet-1K, implemented in Chainer.
     Original paper: 'Dual Path Networks,' https://arxiv.org/abs/1707.01629.
 """
 
@@ -458,7 +458,7 @@ def get_dpn(num_layers,
             for_training=False,
             model_name=None,
             pretrained=False,
-            root=os.path.join('~', '.chainer', 'models'),
+            root=os.path.join("~", ".chainer", "models"),
             **kwargs):
     """
     Create DPN model with specific parameters.

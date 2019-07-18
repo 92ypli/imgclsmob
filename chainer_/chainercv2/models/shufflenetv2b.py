@@ -1,5 +1,5 @@
 """
-    ShuffleNet V2, implemented in Chainer. The alternative version.
+    ShuffleNet V2 for ImageNet-1K, implemented in Chainer. The alternative version.
     Original paper: 'ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design,'
     https://arxiv.org/abs/1807.11164.
 """
@@ -61,8 +61,7 @@ class ShuffleUnit(Chain):
                 in_channels=mid_channels,
                 out_channels=mid_channels,
                 stride=(2 if self.downsample else 1),
-                activation=None,
-                activate=False)
+                activation=None)
             self.conv2 = conv1x1_block(
                 in_channels=mid_channels,
                 out_channels=y2_out_channels)
@@ -73,8 +72,7 @@ class ShuffleUnit(Chain):
                     in_channels=in_channels,
                     out_channels=in_channels,
                     stride=2,
-                    activation=None,
-                    activate=False)
+                    activation=None)
                 self.shortcut_conv = conv1x1_block(
                     in_channels=in_channels,
                     out_channels=in_channels)
@@ -229,7 +227,7 @@ def get_shufflenetv2b(width_scale,
                       shuffle_group_first=True,
                       model_name=None,
                       pretrained=False,
-                      root=os.path.join('~', '.chainer', 'models'),
+                      root=os.path.join("~", ".chainer", "models"),
                       **kwargs):
     """
     Create ShuffleNetV2(b) model with specific parameters.

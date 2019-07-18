@@ -1,5 +1,5 @@
 """
-    SqueezeNet, implemented in Chainer.
+    SqueezeNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size,'
     https://arxiv.org/abs/1602.07360.
 """
@@ -224,7 +224,7 @@ def get_squeezenet(version,
                    residual=False,
                    model_name=None,
                    pretrained=False,
-                   root=os.path.join('~', '.chainer', 'models'),
+                   root=os.path.join("~", ".chainer", "models"),
                    **kwargs):
     """
     Create SqueezeNet model with specific parameters.

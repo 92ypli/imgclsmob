@@ -28,7 +28,7 @@ def dense_unit(x,
         Number of input channels.
     out_channels : int
         Number of output channels.
-    dropout_rate : bool
+    dropout_rate : float
         Parameter of Dropout layer. Faction of the input units to drop.
     name : str, default 'dense_unit'
         Unit name.
@@ -126,7 +126,8 @@ def densenet(channels,
     classes : int, default 1000
         Number of classification classes.
     """
-    input_shape = (in_channels, 224, 224) if is_channels_first() else (224, 224, in_channels)
+    input_shape = (in_channels, in_size[0], in_size[1]) if is_channels_first() else\
+        (in_size[0], in_size[1], in_channels)
     input = nn.Input(shape=input_shape)
 
     x = preres_init_block(
@@ -175,7 +176,7 @@ def densenet(channels,
 def get_densenet(blocks,
                  model_name=None,
                  pretrained=False,
-                 root=os.path.join('~', '.keras', 'models'),
+                 root=os.path.join("~", ".keras", "models"),
                  **kwargs):
     """
     Create DenseNet model with specific parameters.

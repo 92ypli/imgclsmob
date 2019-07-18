@@ -1,5 +1,5 @@
 """
-    MobileNet & FD-MobileNet, implemented in Gluon.
+    MobileNet & FD-MobileNet for ImageNet-1K, implemented in Gluon.
     Original papers:
     - 'MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications,'
        https://arxiv.org/abs/1704.04861.
@@ -7,7 +7,7 @@
 """
 
 __all__ = ['MobileNet', 'mobilenet_w1', 'mobilenet_w3d4', 'mobilenet_wd2', 'mobilenet_wd4', 'fdmobilenet_w1',
-           'fdmobilenet_w3d4', 'fdmobilenet_wd2', 'fdmobilenet_wd4']
+           'fdmobilenet_w3d4', 'fdmobilenet_wd2', 'fdmobilenet_wd4', 'get_mobilenet']
 
 import os
 from mxnet import cpu
@@ -90,7 +90,7 @@ class MobileNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             init_block_channels = channels[0][0]
             self.features.add(conv3x3_block(
                 in_channels=in_channels,
@@ -99,7 +99,7 @@ class MobileNet(HybridBlock):
                 bn_use_global_stats=bn_use_global_stats))
             in_channels = init_block_channels
             for i, channels_per_stage in enumerate(channels[1:]):
-                stage = nn.HybridSequential(prefix='stage{}_'.format(i + 1))
+                stage = nn.HybridSequential(prefix="stage{}_".format(i + 1))
                 with stage.name_scope():
                     for j, out_channels in enumerate(channels_per_stage):
                         strides = 2 if (j == 0) and ((i != 0) or first_stage_stride) else 1
@@ -114,7 +114,7 @@ class MobileNet(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -131,7 +131,7 @@ def get_mobilenet(version,
                   model_name=None,
                   pretrained=False,
                   ctx=cpu(),
-                  root=os.path.join('~', '.mxnet', 'models'),
+                  root=os.path.join("~", ".mxnet", "models"),
                   **kwargs):
     """
     Create MobileNet or FD-MobileNet model with specific parameters.
@@ -252,7 +252,7 @@ def mobilenet_wd4(**kwargs):
 
 def fdmobilenet_w1(**kwargs):
     """
-    FD-MobileNet 1.0x from 'FD-MobileNet: Improved MobileNet with A Fast Downsampling Strategy,'
+    FD-MobileNet 1.0x model from 'FD-MobileNet: Improved MobileNet with A Fast Downsampling Strategy,'
     https://arxiv.org/abs/1802.03750.
 
     Parameters:
@@ -269,7 +269,7 @@ def fdmobilenet_w1(**kwargs):
 
 def fdmobilenet_w3d4(**kwargs):
     """
-    FD-MobileNet 0.75x from 'FD-MobileNet: Improved MobileNet with A Fast Downsampling Strategy,'
+    FD-MobileNet 0.75x model from 'FD-MobileNet: Improved MobileNet with A Fast Downsampling Strategy,'
     https://arxiv.org/abs/1802.03750.
 
     Parameters:
@@ -286,7 +286,7 @@ def fdmobilenet_w3d4(**kwargs):
 
 def fdmobilenet_wd2(**kwargs):
     """
-    FD-MobileNet 0.5x from 'FD-MobileNet: Improved MobileNet with A Fast Downsampling Strategy,'
+    FD-MobileNet 0.5x model from 'FD-MobileNet: Improved MobileNet with A Fast Downsampling Strategy,'
     https://arxiv.org/abs/1802.03750.
 
     Parameters:
@@ -303,7 +303,7 @@ def fdmobilenet_wd2(**kwargs):
 
 def fdmobilenet_wd4(**kwargs):
     """
-    FD-MobileNet 0.25x from 'FD-MobileNet: Improved MobileNet with A Fast Downsampling Strategy,'
+    FD-MobileNet 0.25x model from 'FD-MobileNet: Improved MobileNet with A Fast Downsampling Strategy,'
     https://arxiv.org/abs/1802.03750.
 
     Parameters:

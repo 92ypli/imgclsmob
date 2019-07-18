@@ -1,5 +1,5 @@
 """
-    PNASNet, implemented in Gluon.
+    PNASNet for ImageNet-1K, implemented in Gluon.
     Original paper: 'Progressive Neural Architecture Search,' https://arxiv.org/abs/1712.00559.
 """
 
@@ -478,7 +478,7 @@ class PNASNet(HybridBlock):
             in_channels = stem1_blocks_channels
 
             for i, channels_per_stage in enumerate(channels):
-                stage = nasnet_dual_path_sequential(prefix='stage{}_'.format(i + 1))
+                stage = nasnet_dual_path_sequential(prefix="stage{}_".format(i + 1))
                 for j, out_channels in enumerate(channels_per_stage):
                     reduction = (j == 0)
                     extra_padding = (j == 0) and (i not in [0, 2])
@@ -494,12 +494,12 @@ class PNASNet(HybridBlock):
                     in_channels = out_channels
                 self.features.add(stage)
 
-            self.features.add(nn.Activation('relu'))
+            self.features.add(nn.Activation("relu"))
             self.features.add(nn.AvgPool2D(
                 pool_size=11,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dropout(rate=0.5))
             self.output.add(nn.Dense(
@@ -515,7 +515,7 @@ class PNASNet(HybridBlock):
 def get_pnasnet(model_name=None,
                 pretrained=False,
                 ctx=cpu(),
-                root=os.path.join('~', '.mxnet', 'models'),
+                root=os.path.join("~", ".mxnet", "models"),
                 **kwargs):
     """
     Create PNASNet model with specific parameters.

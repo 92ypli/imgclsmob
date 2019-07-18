@@ -1,5 +1,5 @@
 """
-    DRN, implemented in Chainer.
+    DRN for ImageNet-1K, implemented in Chainer.
     Original paper: 'Dilated Residual Networks,' https://arxiv.org/abs/1705.09914.
 """
 
@@ -401,7 +401,7 @@ def get_drn(blocks,
             simplified=False,
             model_name=None,
             pretrained=False,
-            root=os.path.join('~', '.chainer', 'models'),
+            root=os.path.join("~", ".chainer", "models"),
             **kwargs):
     """
     Create DRN-C or DRN-D model with specific parameters.

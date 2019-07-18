@@ -1,5 +1,5 @@
 """
-    ESPNetv2, implemented in Chainer.
+    ESPNetv2 for ImageNet-1K, implemented in Chainer.
     Original paper: 'ESPNetv2: A Light-weight, Power Efficient, and General Purpose Convolutional Neural Network,'
     https://arxiv.org/abs/1811.11431.
 """
@@ -63,8 +63,7 @@ class ShortcutBlock(Chain):
             self.conv2 = conv1x1_block(
                 in_channels=in_channels,
                 out_channels=out_channels,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def __call__(self, x):
         x = self.conv1(x)
@@ -146,8 +145,7 @@ class ESPBlock(Chain):
                 in_channels=out_channels,
                 out_channels=out_channels,
                 groups=num_branches,
-                activation=None,
-                activate=False)
+                activation=None)
             self.preactiv = PreActivation(in_channels=out_channels)
             self.activ = L.PReLU(shape=(out_channels,))
 
@@ -382,7 +380,7 @@ class ESPNetv2(Chain):
 def get_espnetv2(width_scale,
                  model_name=None,
                  pretrained=False,
-                 root=os.path.join('~', '.chainer', 'models'),
+                 root=os.path.join("~", ".chainer", "models"),
                  **kwargs):
     """
     Create ESPNetv2 model with specific parameters.

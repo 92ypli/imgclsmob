@@ -1,5 +1,5 @@
 """
-    ShuffleNet V2, implemented in TensorFlow.
+    ShuffleNet V2 for ImageNet-1K, implemented in TensorFlow.
     Original paper: 'ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design,'
     https://arxiv.org/abs/1807.11164.
 """
@@ -306,7 +306,7 @@ class ShuffleNetV2(object):
 def get_shufflenetv2(width_scale,
                      model_name=None,
                      pretrained=False,
-                     root=os.path.join('~', '.tensorflow', 'models'),
+                     root=os.path.join("~", ".tensorflow", "models"),
                      **kwargs):
     """
     Create ShuffleNetV2 model with specific parameters.

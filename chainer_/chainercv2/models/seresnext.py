@@ -1,5 +1,5 @@
 """
-    SE-ResNeXt, implemented in Chainer.
+    SE-ResNeXt for ImageNet-1K, implemented in Chainer.
     Original paper: 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
 """
 
@@ -55,7 +55,7 @@ class SEResNeXtUnit(Chain):
                     in_channels=in_channels,
                     out_channels=out_channels,
                     stride=stride,
-                    activate=False)
+                    activation=None)
             self.activ = F.relu
 
     def __call__(self, x):
@@ -148,7 +148,7 @@ def get_seresnext(blocks,
                   bottleneck_width,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.chainer', 'models'),
+                  root=os.path.join("~", ".chainer", "models"),
                   **kwargs):
     """
     Create SE-ResNeXt model with specific parameters.

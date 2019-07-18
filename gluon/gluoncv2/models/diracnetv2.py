@@ -1,5 +1,5 @@
 """
-    DiracNetV2, implemented in Gluon.
+    DiracNetV2 for ImageNet-1K, implemented in Gluon.
     Original paper: 'DiracNets: Training Very Deep Neural Networks Without Skip-Connections,'
     https://arxiv.org/abs/1706.00388.
 """
@@ -38,7 +38,7 @@ class DiracConv(HybridBlock):
                  **kwargs):
         super(DiracConv, self).__init__(**kwargs)
         with self.name_scope():
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
             self.conv = nn.Conv2D(
                 channels=out_channels,
                 kernel_size=kernel_size,
@@ -138,13 +138,13 @@ class DiracNetV2(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(DiracInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels))
             in_channels = init_block_channels
             for i, channels_per_stage in enumerate(channels):
-                stage = nn.HybridSequential(prefix='stage{}_'.format(i + 1))
+                stage = nn.HybridSequential(prefix="stage{}_".format(i + 1))
                 with stage.name_scope():
                     for j, out_channels in enumerate(channels_per_stage):
                         stage.add(dirac_conv3x3(
@@ -157,12 +157,12 @@ class DiracNetV2(HybridBlock):
                             strides=2,
                             padding=0))
                 self.features.add(stage)
-            self.features.add(nn.Activation('relu'))
+            self.features.add(nn.Activation("relu"))
             self.features.add(nn.AvgPool2D(
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -178,7 +178,7 @@ def get_diracnetv2(blocks,
                    model_name=None,
                    pretrained=False,
                    ctx=cpu(),
-                   root=os.path.join('~', '.mxnet', 'models'),
+                   root=os.path.join("~", ".mxnet", "models"),
                    **kwargs):
     """
     Create DiracNetV2 model with specific parameters.

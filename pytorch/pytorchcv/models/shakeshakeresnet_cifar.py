@@ -209,7 +209,7 @@ def get_shakeshakeresnet_cifar(classes,
                                first_stage_channels=16,
                                model_name=None,
                                pretrained=False,
-                               root=os.path.join('~', '.torch', 'models'),
+                               root=os.path.join("~", ".torch", "models"),
                                **kwargs):
     """
     Create Shake-Shake-ResNet model for CIFAR with specific parameters.
@@ -382,7 +382,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -410,7 +409,7 @@ def _test():
         assert (model != shakeshakeresnet26_2x32d_cifar100 or weight_count == 2934772)
         assert (model != shakeshakeresnet26_2x32d_svhn or weight_count == 2923162)
 
-        x = Variable(torch.randn(14, 3, 32, 32))
+        x = torch.randn(14, 3, 32, 32)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (14, num_classes))

@@ -1,5 +1,5 @@
 """
-    ResAttNet, implemented in Chainer.
+    ResAttNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'Residual Attention Network for Image Classification,' https://arxiv.org/abs/1704.06904.
 """
 
@@ -490,7 +490,7 @@ class ResAttNet(Chain):
 def get_resattnet(blocks,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.chainer', 'models'),
+                  root=os.path.join("~", ".chainer", "models"),
                   **kwargs):
     """
     Create ResAttNet model with specific parameters.

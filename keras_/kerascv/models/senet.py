@@ -1,9 +1,9 @@
 """
-    SENet, implemented in Keras.
+    SENet for ImageNet-1K, implemented in Keras.
     Original paper: 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
 """
 
-__all__ = ['senet', 'senet52', 'senet103', 'senet154']
+__all__ = ['senet', 'senet16', 'senet28', 'senet40', 'senet52', 'senet103', 'senet154']
 
 import os
 import math
@@ -65,7 +65,7 @@ def senet_bottleneck(x,
         x=x,
         in_channels=group_width,
         out_channels=out_channels,
-        activate=False,
+        activation=None,
         name=name + "/conv3")
     return x
 
@@ -113,7 +113,7 @@ def senet_unit(x,
                 in_channels=in_channels,
                 out_channels=out_channels,
                 strides=strides,
-                activate=False,
+                activation=None,
                 name=name + "/identity_conv")
         else:
             identity = conv1x1_block(
@@ -121,7 +121,7 @@ def senet_unit(x,
                 in_channels=in_channels,
                 out_channels=out_channels,
                 strides=strides,
-                activate=False,
+                activation=None,
                 name=name + "/identity_conv")
     else:
         identity = x
@@ -223,7 +223,8 @@ def senet(channels,
     classes : int, default 1000
         Number of classification classes.
     """
-    input_shape = (in_channels, 224, 224) if is_channels_first() else (224, 224, in_channels)
+    input_shape = (in_channels, in_size[0], in_size[1]) if is_channels_first() else\
+        (in_size[0], in_size[1], in_channels)
     input = nn.Input(shape=input_shape)
 
     x = senet_init_block(
@@ -270,7 +271,7 @@ def senet(channels,
 def get_senet(blocks,
               model_name=None,
               pretrained=False,
-              root=os.path.join('~', '.keras', 'models'),
+              root=os.path.join("~", ".keras", "models"),
               **kwargs):
     """
     Create SENet model with specific parameters.
@@ -287,7 +288,16 @@ def get_senet(blocks,
         Location for keeping the model parameters.
     """
 
-    if blocks == 52:
+    if blocks == 16:
+        layers = [1, 1, 1, 1]
+        cardinality = 32
+    elif blocks == 28:
+        layers = [2, 2, 2, 2]
+        cardinality = 32
+    elif blocks == 40:
+        layers = [3, 3, 3, 3]
+        cardinality = 32
+    elif blocks == 52:
         layers = [3, 4, 6, 3]
         cardinality = 32
     elif blocks == 103:
@@ -322,6 +332,48 @@ def get_senet(blocks,
             local_model_store_dir_path=root)
 
     return net
+
+
+def senet16(**kwargs):
+    """
+    SENet-16 model from 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.keras/models'
+        Location for keeping the model parameters.
+    """
+    return get_senet(blocks=16, model_name="senet16", **kwargs)
+
+
+def senet28(**kwargs):
+    """
+    SENet-28 model from 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.keras/models'
+        Location for keeping the model parameters.
+    """
+    return get_senet(blocks=28, model_name="senet28", **kwargs)
+
+
+def senet40(**kwargs):
+    """
+    SENet-40 model from 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.keras/models'
+        Location for keeping the model parameters.
+    """
+    return get_senet(blocks=40, model_name="senet40", **kwargs)
 
 
 def senet52(**kwargs):
@@ -373,6 +425,9 @@ def _test():
     pretrained = False
 
     models = [
+        senet16,
+        senet28,
+        senet40,
         senet52,
         senet103,
         senet154,
@@ -384,6 +439,9 @@ def _test():
         # net.summary()
         weight_count = keras.utils.layer_utils.count_params(net.trainable_weights)
         print("m={}, {}".format(model.__name__, weight_count))
+        assert (model != senet16 or weight_count == 31366168)
+        assert (model != senet28 or weight_count == 36453768)
+        assert (model != senet40 or weight_count == 41541368)
         assert (model != senet52 or weight_count == 44659416)
         assert (model != senet103 or weight_count == 60963096)
         assert (model != senet154 or weight_count == 115088984)

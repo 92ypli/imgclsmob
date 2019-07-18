@@ -1,9 +1,9 @@
 """
-    SENet, implemented in PyTorch.
+    SENet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
 """
 
-__all__ = ['SENet', 'senet52', 'senet103', 'senet154', 'SEInitBlock']
+__all__ = ['SENet', 'senet16', 'senet28', 'senet40', 'senet52', 'senet103', 'senet154', 'SEInitBlock']
 
 import os
 import math
@@ -52,7 +52,7 @@ class SENetBottleneck(nn.Module):
         self.conv3 = conv1x1_block(
             in_channels=group_width,
             out_channels=out_channels,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -103,13 +103,13 @@ class SENetUnit(nn.Module):
                     in_channels=in_channels,
                     out_channels=out_channels,
                     stride=stride,
-                    activate=False)
+                    activation=None)
             else:
                 self.identity_conv = conv1x1_block(
                     in_channels=in_channels,
                     out_channels=out_channels,
                     stride=stride,
-                    activate=False)
+                    activation=None)
         self.activ = nn.ReLU(inplace=True)
 
     def forward(self, x):
@@ -245,7 +245,7 @@ class SENet(nn.Module):
 def get_senet(blocks,
               model_name=None,
               pretrained=False,
-              root=os.path.join('~', '.torch', 'models'),
+              root=os.path.join("~", ".torch", "models"),
               **kwargs):
     """
     Create SENet model with specific parameters.
@@ -262,7 +262,16 @@ def get_senet(blocks,
         Location for keeping the model parameters.
     """
 
-    if blocks == 52:
+    if blocks == 16:
+        layers = [1, 1, 1, 1]
+        cardinality = 32
+    elif blocks == 28:
+        layers = [2, 2, 2, 2]
+        cardinality = 32
+    elif blocks == 40:
+        layers = [3, 3, 3, 3]
+        cardinality = 32
+    elif blocks == 52:
         layers = [3, 4, 6, 3]
         cardinality = 32
     elif blocks == 103:
@@ -297,6 +306,48 @@ def get_senet(blocks,
             local_model_store_dir_path=root)
 
     return net
+
+
+def senet16(**kwargs):
+    """
+    SENet-16 model from 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_senet(blocks=16, model_name="senet16", **kwargs)
+
+
+def senet28(**kwargs):
+    """
+    SENet-28 model from 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_senet(blocks=28, model_name="senet28", **kwargs)
+
+
+def senet40(**kwargs):
+    """
+    SENet-40 model from 'Squeeze-and-Excitation Networks,' https://arxiv.org/abs/1709.01507.
+
+    Parameters:
+    ----------
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_senet(blocks=40, model_name="senet40", **kwargs)
 
 
 def senet52(**kwargs):
@@ -352,11 +403,13 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
     models = [
+        senet16,
+        senet28,
+        senet40,
         senet52,
         senet103,
         senet154,
@@ -370,11 +423,14 @@ def _test():
         net.eval()
         weight_count = _calc_width(net)
         print("m={}, {}".format(model.__name__, weight_count))
+        assert (model != senet16 or weight_count == 31366168)
+        assert (model != senet28 or weight_count == 36453768)
+        assert (model != senet40 or weight_count == 41541368)
         assert (model != senet52 or weight_count == 44659416)
         assert (model != senet103 or weight_count == 60963096)
         assert (model != senet154 or weight_count == 115088984)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

@@ -1,5 +1,5 @@
 """
-    CBAM-ResNet, implemented in PyTorch.
+    CBAM-ResNet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'CBAM: Convolutional Block Attention Module,' https://arxiv.org/abs/1807.06521.
 """
 
@@ -90,7 +90,7 @@ class SpatialGate(nn.Module):
         self.conv = conv7x7_block(
             in_channels=2,
             out_channels=1,
-            activate=False)
+            activation=None)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
@@ -168,7 +168,7 @@ class CbamResUnit(nn.Module):
                 in_channels=in_channels,
                 out_channels=out_channels,
                 stride=stride,
-                activate=False)
+                activation=None)
         self.cbam = CbamBlock(channels=out_channels)
         self.activ = nn.ReLU(inplace=True)
 
@@ -257,7 +257,7 @@ class CbamResNet(nn.Module):
 def get_resnet(blocks,
                model_name=None,
                pretrained=False,
-               root=os.path.join('~', '.torch', 'models'),
+               root=os.path.join("~", ".torch", "models"),
                **kwargs):
     """
     Create CBAM-ResNet model with specific parameters.
@@ -403,16 +403,15 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
     models = [
-        # cbam_resnet18,
-        # cbam_resnet34,
+        cbam_resnet18,
+        cbam_resnet34,
         cbam_resnet50,
-        # cbam_resnet101,
-        # cbam_resnet152,
+        cbam_resnet101,
+        cbam_resnet152,
     ]
 
     for model in models:
@@ -429,7 +428,7 @@ def _test():
         assert (model != cbam_resnet101 or weight_count == 49330172)
         assert (model != cbam_resnet152 or weight_count == 66826848)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

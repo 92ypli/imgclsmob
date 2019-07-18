@@ -1,5 +1,5 @@
 """
-    ChannelNet, implemented in TensorFlow.
+    ChannelNet for ImageNet-1K, implemented in TensorFlow.
     Original paper: 'ChannelNets: Compact and Efficient Convolutional Neural Networks via Channel-Wise Convolutions,'
     https://arxiv.org/abs/1809.01330.
 """
@@ -706,7 +706,7 @@ class ChannelNet(object):
 
 def get_channelnet(model_name=None,
                    pretrained=False,
-                   root=os.path.join('~', '.tensorflow', 'models'),
+                   root=os.path.join("~", ".tensorflow", "models"),
                    **kwargs):
     """
     Create ChannelNet model with specific parameters.

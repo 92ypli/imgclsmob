@@ -1,5 +1,5 @@
 """
-    CondenseNet, implemented in Chainer.
+    CondenseNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'CondenseNet: An Efficient DenseNet using Learned Group Convolutions,'
     https://arxiv.org/abs/1711.09224.
 """
@@ -392,7 +392,7 @@ def get_condensenet(num_layers,
                     groups=4,
                     model_name=None,
                     pretrained=False,
-                    root=os.path.join('~', '.chainer', 'models'),
+                    root=os.path.join("~", ".chainer", "models"),
                     **kwargs):
     """
     Create CondenseNet (converted) model with specific parameters.

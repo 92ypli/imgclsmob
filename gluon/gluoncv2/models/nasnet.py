@@ -1,5 +1,5 @@
 """
-    NASNet-A, implemented in Gluon.
+    NASNet-A for ImageNet-1K, implemented in Gluon.
     Original paper: 'Learning Transferable Architectures for Scalable Image Recognition,'
     https://arxiv.org/abs/1707.07012.
 """
@@ -279,7 +279,7 @@ class NasConv(HybridBlock):
                  **kwargs):
         super(NasConv, self).__init__(**kwargs)
         with self.name_scope():
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
             self.conv = nn.Conv2D(
                 channels=out_channels,
                 kernel_size=kernel_size,
@@ -397,7 +397,7 @@ class NasDwsConv(HybridBlock):
         self.extra_padding = extra_padding
 
         with self.name_scope():
-            self.activ = nn.Activation(activation='relu')
+            self.activ = nn.Activation(activation="relu")
             self.conv = DwsConv(
                 in_channels=in_channels,
                 out_channels=out_channels,
@@ -630,7 +630,7 @@ class NasPathBlock(HybridBlock):
         mid_channels = out_channels // 2
 
         with self.name_scope():
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
             self.path1 = NasPathBranch(
                 in_channels=in_channels,
                 out_channels=mid_channels)
@@ -1127,7 +1127,7 @@ class NASNet(HybridBlock):
                 return_two=False,
                 first_ordinals=1,
                 last_ordinals=2,
-                prefix='')
+                prefix="")
             self.features.add(NASNetInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels))
@@ -1176,12 +1176,12 @@ class NASNet(HybridBlock):
                         in_channels = out_channels
                 self.features.add(stage)
 
-            self.features.add(nn.Activation('relu'))
+            self.features.add(nn.Activation("relu"))
             self.features.add(nn.AvgPool2D(
                 pool_size=final_pool_size,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dropout(rate=0.5))
             self.output.add(nn.Dense(
@@ -1204,7 +1204,7 @@ def get_nasnet(repeat,
                model_name=None,
                pretrained=False,
                ctx=cpu(),
-               root=os.path.join('~', '.mxnet', 'models'),
+               root=os.path.join("~", ".mxnet", "models"),
                **kwargs):
     """
     Create NASNet-A model with specific parameters.

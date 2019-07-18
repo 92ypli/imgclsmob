@@ -1,5 +1,5 @@
 """
-    VGG, implemented in Chainer.
+    VGG for ImageNet-1K, implemented in Chainer.
     Original paper: 'Very Deep Convolutional Networks for Large-Scale Image Recognition,'
     https://arxiv.org/abs/1409.1556.
 """
@@ -238,7 +238,7 @@ def get_vgg(blocks,
             use_bn=False,
             model_name=None,
             pretrained=False,
-            root=os.path.join('~', '.chainer', 'models'),
+            root=os.path.join("~", ".chainer", "models"),
             **kwargs):
     """
     Create VGG model with specific parameters.

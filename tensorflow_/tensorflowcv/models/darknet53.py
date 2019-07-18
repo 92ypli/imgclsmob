@@ -1,5 +1,5 @@
 """
-    DarkNet-53, implemented in TensorFlow.
+    DarkNet-53 for ImageNet-1K, implemented in TensorFlow.
     Original source: 'YOLOv3: An Incremental Improvement,' https://arxiv.org/abs/1804.02767.
 """
 
@@ -183,7 +183,7 @@ class DarkNet53(object):
 
 def get_darknet53(model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.tensorflow', 'models'),
+                  root=os.path.join("~", ".tensorflow", "models"),
                   **kwargs):
     """
     Create DarkNet model with specific parameters.

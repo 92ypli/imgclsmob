@@ -1,5 +1,5 @@
 """
-    CBAM-ResNet, implemented in Gluon.
+    CBAM-ResNet for ImageNet-1K, implemented in Gluon.
     Original paper: 'CBAM: Convolutional Block Attention Module,' https://arxiv.org/abs/1807.06521.
 """
 
@@ -35,7 +35,7 @@ class MLP(HybridBlock):
             self.fc1 = nn.Dense(
                 units=mid_channels,
                 in_units=channels)
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
             self.fc2 = nn.Dense(
                 units=channels,
                 in_units=mid_channels)
@@ -70,7 +70,7 @@ class ChannelGate(HybridBlock):
             self.mlp = MLP(
                 channels=channels,
                 reduction_ratio=reduction_ratio)
-            self.sigmoid = nn.Activation('sigmoid')
+            self.sigmoid = nn.Activation("sigmoid")
 
     def hybrid_forward(self, F, x):
         att1 = self.avg_pool(x)
@@ -102,8 +102,8 @@ class SpatialGate(HybridBlock):
                 in_channels=2,
                 out_channels=1,
                 bn_use_global_stats=bn_use_global_stats,
-                activate=False)
-            self.sigmoid = nn.Activation('sigmoid')
+                activation=None)
+            self.sigmoid = nn.Activation("sigmoid")
 
     def hybrid_forward(self, F, x):
         att1 = x.max(axis=1).expand_dims(1)
@@ -193,9 +193,9 @@ class CbamResUnit(HybridBlock):
                     out_channels=out_channels,
                     strides=strides,
                     bn_use_global_stats=bn_use_global_stats,
-                    activate=False)
+                    activation=None)
             self.cbam = CbamBlock(channels=out_channels)
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
 
     def hybrid_forward(self, F, x):
         if self.resize_identity:
@@ -245,14 +245,14 @@ class CbamResNet(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(ResInitBlock(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
                 bn_use_global_stats=bn_use_global_stats))
             in_channels = init_block_channels
             for i, channels_per_stage in enumerate(channels):
-                stage = nn.HybridSequential(prefix='stage{}_'.format(i + 1))
+                stage = nn.HybridSequential(prefix="stage{}_".format(i + 1))
                 with stage.name_scope():
                     for j, out_channels in enumerate(channels_per_stage):
                         strides = 2 if (j == 0) and (i != 0) else 1
@@ -268,7 +268,7 @@ class CbamResNet(HybridBlock):
                 pool_size=7,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -284,7 +284,7 @@ def get_resnet(blocks,
                model_name=None,
                pretrained=False,
                ctx=cpu(),
-               root=os.path.join('~', '.mxnet', 'models'),
+               root=os.path.join("~", ".mxnet", "models"),
                **kwargs):
     """
     Create CBAM-ResNet model with specific parameters.

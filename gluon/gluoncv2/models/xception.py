@@ -1,5 +1,5 @@
 """
-    Xception, implemented in Gluon.
+    Xception for ImageNet-1K, implemented in Gluon.
     Original paper: 'Xception: Deep Learning with Depthwise Separable Convolutions,' https://arxiv.org/abs/1610.02357.
 """
 
@@ -92,7 +92,7 @@ class DwsConvBlock(HybridBlock):
 
         with self.name_scope():
             if self.activate:
-                self.activ = nn.Activation('relu')
+                self.activ = nn.Activation("relu")
             self.conv = DwsConv(
                 in_channels=in_channels,
                 out_channels=out_channels,
@@ -179,9 +179,9 @@ class XceptionUnit(HybridBlock):
                     out_channels=out_channels,
                     strides=strides,
                     bn_use_global_stats=bn_use_global_stats,
-                    activate=False)
+                    activation=None)
 
-            self.body = nn.HybridSequential(prefix='')
+            self.body = nn.HybridSequential(prefix="")
             for i in range(reps):
                 if (grow_first and (i == 0)) or ((not grow_first) and (i == reps - 1)):
                     in_channels_i = in_channels
@@ -237,15 +237,13 @@ class XceptionInitBlock(HybridBlock):
                 out_channels=32,
                 strides=2,
                 padding=0,
-                bn_use_global_stats=bn_use_global_stats,
-                activate=True)
+                bn_use_global_stats=bn_use_global_stats)
             self.conv2 = conv3x3_block(
                 in_channels=32,
                 out_channels=64,
                 strides=1,
                 padding=0,
-                bn_use_global_stats=bn_use_global_stats,
-                activate=True)
+                bn_use_global_stats=bn_use_global_stats)
 
     def hybrid_forward(self, F, x):
         x = self.conv1(x)
@@ -277,7 +275,7 @@ class XceptionFinalBlock(HybridBlock):
                 out_channels=2048,
                 bn_use_global_stats=bn_use_global_stats,
                 activate=True)
-            self.activ = nn.Activation('relu')
+            self.activ = nn.Activation("relu")
             self.pool = nn.AvgPool2D(
                 pool_size=10,
                 strides=1)
@@ -320,13 +318,13 @@ class Xception(HybridBlock):
         self.classes = classes
 
         with self.name_scope():
-            self.features = nn.HybridSequential(prefix='')
+            self.features = nn.HybridSequential(prefix="")
             self.features.add(XceptionInitBlock(
                 in_channels=in_channels,
                 bn_use_global_stats=bn_use_global_stats))
             in_channels = 64
             for i, channels_per_stage in enumerate(channels):
-                stage = nn.HybridSequential(prefix='stage{}_'.format(i + 1))
+                stage = nn.HybridSequential(prefix="stage{}_".format(i + 1))
                 with stage.name_scope():
                     for j, out_channels in enumerate(channels_per_stage):
                         stage.add(XceptionUnit(
@@ -341,7 +339,7 @@ class Xception(HybridBlock):
                 self.features.add(stage)
             self.features.add(XceptionFinalBlock(bn_use_global_stats=bn_use_global_stats))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -356,7 +354,7 @@ class Xception(HybridBlock):
 def get_xception(model_name=None,
                  pretrained=False,
                  ctx=cpu(),
-                 root=os.path.join('~', '.mxnet', 'models'),
+                 root=os.path.join("~", ".mxnet", "models"),
                  **kwargs):
     """
     Create Xception model with specific parameters.

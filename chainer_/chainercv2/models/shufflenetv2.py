@@ -1,5 +1,5 @@
 """
-    ShuffleNet V2, implemented in Chainer.
+    ShuffleNet V2 for ImageNet-1K, implemented in Chainer.
     Original paper: 'ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design,'
     https://arxiv.org/abs/1807.11164.
 """
@@ -228,7 +228,7 @@ class ShuffleNetV2(Chain):
 def get_shufflenetv2(width_scale,
                      model_name=None,
                      pretrained=False,
-                     root=os.path.join('~', '.chainer', 'models'),
+                     root=os.path.join("~", ".chainer", "models"),
                      **kwargs):
     """
     Create ShuffleNetV2 model with specific parameters.

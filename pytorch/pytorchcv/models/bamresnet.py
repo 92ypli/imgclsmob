@@ -1,5 +1,5 @@
 """
-    BAM-ResNet, implemented in PyTorch.
+    BAM-ResNet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'BAM: Bottleneck Attention Module,' https://arxiv.org/abs/1807.06514.
 """
 
@@ -111,8 +111,7 @@ class SpatialGate(nn.Module):
             in_channels=channels,
             out_channels=mid_channels,
             stride=1,
-            bias=True,
-            activate=True)
+            bias=True)
         self.dil_convs = nn.Sequential()
         for i in range(num_dil_convs):
             self.dil_convs.add_module("conv{}".format(i + 1), conv3x3_block(
@@ -121,8 +120,7 @@ class SpatialGate(nn.Module):
                 stride=1,
                 padding=dilation,
                 dilation=dilation,
-                bias=True,
-                activate=True))
+                bias=True))
         self.final_conv = conv1x1(
             in_channels=mid_channels,
             out_channels=1,
@@ -272,7 +270,7 @@ class BamResNet(nn.Module):
 def get_resnet(blocks,
                model_name=None,
                pretrained=False,
-               root=os.path.join('~', '.torch', 'models'),
+               root=os.path.join("~", ".torch", "models"),
                **kwargs):
     """
     Create BAM-ResNet model with specific parameters.
@@ -418,7 +416,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -444,7 +441,7 @@ def _test():
         assert (model != bam_resnet101 or weight_count == 44907227)
         assert (model != bam_resnet152 or weight_count == 60550875)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

@@ -1,5 +1,5 @@
 """
-    ShaResNet, implemented in PyTorch.
+    ShaResNet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'ShaResNet: reducing residual network parameter number by sharing weights,'
     https://arxiv.org/abs/1702.08782.
 """
@@ -224,8 +224,7 @@ class ShaResBottleneck(nn.Module):
         self.conv3 = conv1x1_block(
             in_channels=mid_channels,
             out_channels=out_channels,
-            activation=None,
-            activate=False)
+            activation=None)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -281,7 +280,7 @@ class ShaResUnit(nn.Module):
                 in_channels=in_channels,
                 out_channels=out_channels,
                 stride=stride,
-                activate=False)
+                activation=None)
         self.activ = nn.ReLU(inplace=True)
 
     def forward(self, x):
@@ -379,7 +378,7 @@ def get_sharesnet(blocks,
                   conv1_stride=True,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.torch', 'models'),
+                  root=os.path.join("~", ".torch", "models"),
                   **kwargs):
     """
     Create ShaResNet model with specific parameters.
@@ -574,7 +573,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -606,7 +604,7 @@ def _test():
         assert (model != sharesnet152 or weight_count == 33724456)
         assert (model != sharesnet152b or weight_count == 36821032)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

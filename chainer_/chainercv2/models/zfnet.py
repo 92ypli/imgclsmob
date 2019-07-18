@@ -1,5 +1,5 @@
 """
-    ZFNet, implemented in Chainer.
+    ZFNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'Visualizing and Understanding Convolutional Networks,' https://arxiv.org/abs/1311.2901.
 """
 
@@ -229,7 +229,7 @@ class ZFNet(Chain):
 
 def get_alexnet(model_name=None,
                 pretrained=False,
-                root=os.path.join('~', '.chainer', 'models'),
+                root=os.path.join("~", ".chainer", "models"),
                 **kwargs):
     """
     Create ZFNet model with specific parameters.

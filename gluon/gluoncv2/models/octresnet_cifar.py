@@ -58,7 +58,7 @@ class CIFAROctResNet(HybridBlock):
                 return_two=False,
                 first_ordinals=1,
                 last_ordinals=1,
-                prefix='')
+                prefix="")
             self.features.add(conv3x3_block(
                 in_channels=in_channels,
                 out_channels=init_block_channels,
@@ -92,7 +92,7 @@ class CIFAROctResNet(HybridBlock):
                 pool_size=8,
                 strides=1))
 
-            self.output = nn.HybridSequential(prefix='')
+            self.output = nn.HybridSequential(prefix="")
             self.output.add(nn.Flatten())
             self.output.add(nn.Dense(
                 units=classes,
@@ -111,7 +111,7 @@ def get_octresnet_cifar(classes,
                         model_name=None,
                         pretrained=False,
                         ctx=cpu(),
-                        root=os.path.join('~', '.mxnet', 'models'),
+                        root=os.path.join("~", ".mxnet", "models"),
                         **kwargs):
     """
     Create Oct-ResNet model for CIFAR with specific parameters.

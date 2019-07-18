@@ -1,5 +1,5 @@
 """
-    ShuffleNet, implemented in TensorFlow.
+    ShuffleNet for ImageNet-1K, implemented in TensorFlow.
     Original paper: 'ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices,'
     https://arxiv.org/abs/1707.01083.
 """
@@ -277,7 +277,7 @@ def get_shufflenet(groups,
                    width_scale,
                    model_name=None,
                    pretrained=False,
-                   root=os.path.join('~', '.tensorflow', 'models'),
+                   root=os.path.join("~", ".tensorflow", "models"),
                    **kwargs):
     """
     Create ShuffleNet model with specific parameters.

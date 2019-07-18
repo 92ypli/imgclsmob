@@ -1,5 +1,5 @@
 """
-    AlexNet, implemented in Chainer.
+    AlexNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'One weird trick for parallelizing convolutional neural networks,'
     https://arxiv.org/abs/1404.5997.
 """
@@ -196,7 +196,7 @@ class AlexNet(Chain):
 
 def get_alexnet(model_name=None,
                 pretrained=False,
-                root=os.path.join('~', '.chainer', 'models'),
+                root=os.path.join("~", ".chainer", "models"),
                 **kwargs):
     """
     Create AlexNet model with specific parameters.

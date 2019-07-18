@@ -1,5 +1,5 @@
 """
-    MobileNet & FD-MobileNet, implemented in TensorFlow.
+    MobileNet & FD-MobileNet for ImageNet-1K, implemented in TensorFlow.
     Original papers:
     - 'MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications,'
        https://arxiv.org/abs/1704.04861.
@@ -167,7 +167,7 @@ def get_mobilenet(version,
                   width_scale,
                   model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.tensorflow', 'models'),
+                  root=os.path.join("~", ".tensorflow", "models"),
                   **kwargs):
     """
     Create MobileNet or FD-MobileNet model with specific parameters.

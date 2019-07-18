@@ -1,5 +1,5 @@
 """
-    ChannelNet, implemented in Chainer.
+    ChannelNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'ChannelNets: Compact and Efficient Convolutional Neural Networks via Channel-Wise Convolutions,'
     https://arxiv.org/abs/1809.01330.
 """
@@ -524,7 +524,7 @@ class ChannelNet(Chain):
 
 def get_channelnet(model_name=None,
                    pretrained=False,
-                   root=os.path.join('~', '.chainer', 'models'),
+                   root=os.path.join("~", ".chainer", "models"),
                    **kwargs):
     """
     Create ChannelNet model with specific parameters.

@@ -1,5 +1,5 @@
 """
-    Xception, implemented in PyTorch.
+    Xception for ImageNet-1K, implemented in PyTorch.
     Original paper: 'Xception: Deep Learning with Depthwise Separable Convolutions,' https://arxiv.org/abs/1610.02357.
 """
 
@@ -160,7 +160,7 @@ class XceptionUnit(nn.Module):
                 in_channels=in_channels,
                 out_channels=out_channels,
                 stride=stride,
-                activate=False)
+                activation=None)
 
         self.body = nn.Sequential()
         for i in range(reps):
@@ -211,14 +211,12 @@ class XceptionInitBlock(nn.Module):
             in_channels=in_channels,
             out_channels=32,
             stride=2,
-            padding=0,
-            activate=True)
+            padding=0)
         self.conv2 = conv3x3_block(
             in_channels=32,
             out_channels=64,
             stride=1,
-            padding=0,
-            activate=True)
+            padding=0)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -318,7 +316,7 @@ class Xception(nn.Module):
 
 def get_xception(model_name=None,
                  pretrained=False,
-                 root=os.path.join('~', '.torch', 'models'),
+                 root=os.path.join("~", ".torch", "models"),
                  **kwargs):
     """
     Create Xception model with specific parameters.
@@ -377,7 +375,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -395,7 +392,7 @@ def _test():
         print("m={}, {}".format(model.__name__, weight_count))
         assert (model != xception or weight_count == 22855952)
 
-        x = Variable(torch.randn(1, 3, 299, 299))
+        x = torch.randn(1, 3, 299, 299)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

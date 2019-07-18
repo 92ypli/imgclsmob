@@ -3,8 +3,13 @@
     Original paper: 'Aggregated Residual Transformations for Deep Neural Networks,' http://arxiv.org/abs/1611.05431.
 """
 
-__all__ = ['CIFARResNeXt', 'resnext29_32x4d_cifar10', 'resnext29_32x4d_cifar100', 'resnext29_32x4d_svhn',
-           'resnext29_16x64d_cifar10', 'resnext29_16x64d_cifar100', 'resnext29_16x64d_svhn']
+__all__ = ['CIFARResNeXt', 'resnext20_16x4d_cifar10', 'resnext20_16x4d_cifar100', 'resnext20_16x4d_svhn',
+           'resnext20_32x2d_cifar10', 'resnext20_32x2d_cifar100', 'resnext20_32x2d_svhn',
+           'resnext20_32x4d_cifar10', 'resnext20_32x4d_cifar100', 'resnext20_32x4d_svhn',
+           'resnext29_32x4d_cifar10', 'resnext29_32x4d_cifar100', 'resnext29_32x4d_svhn',
+           'resnext29_16x64d_cifar10', 'resnext29_16x64d_cifar100', 'resnext29_16x64d_svhn',
+           'resnext272_1x64d_cifar10', 'resnext272_1x64d_cifar100', 'resnext272_1x64d_svhn',
+           'resnext272_2x32d_cifar10', 'resnext272_2x32d_cifar100', 'resnext272_2x32d_svhn']
 
 import os
 import torch.nn as nn
@@ -94,7 +99,7 @@ def get_resnext_cifar(num_classes,
                       bottleneck_width,
                       model_name=None,
                       pretrained=False,
-                      root=os.path.join('~', '.torch', 'models'),
+                      root=os.path.join("~", ".torch", "models"),
                       **kwargs):
     """
     ResNeXt model for CIFAR with specific parameters.
@@ -142,6 +147,168 @@ def get_resnext_cifar(num_classes,
             local_model_store_dir_path=root)
 
     return net
+
+
+def resnext20_16x4d_cifar10(num_classes=10, **kwargs):
+    """
+    ResNeXt-20 (16x4d) model for CIFAR-10 from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 10
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=20, cardinality=16, bottleneck_width=4,
+                             model_name="resnext20_16x4d_cifar10", **kwargs)
+
+
+def resnext20_16x4d_cifar100(num_classes=100, **kwargs):
+    """
+    ResNeXt-20 (16x4d) model for CIFAR-100 from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 100
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=20, cardinality=16, bottleneck_width=4,
+                             model_name="resnext20_16x4d_cifar100", **kwargs)
+
+
+def resnext20_16x4d_svhn(num_classes=10, **kwargs):
+    """
+    ResNeXt-20 (16x4d) model for SVHN from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 10
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=20, cardinality=16, bottleneck_width=4,
+                             model_name="resnext20_16x4d_svhn", **kwargs)
+
+
+def resnext20_32x2d_cifar10(num_classes=10, **kwargs):
+    """
+    ResNeXt-20 (32x2d) model for CIFAR-10 from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 10
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=20, cardinality=32, bottleneck_width=2,
+                             model_name="resnext20_32x2d_cifar10", **kwargs)
+
+
+def resnext20_32x2d_cifar100(num_classes=100, **kwargs):
+    """
+    ResNeXt-20 (32x2d) model for CIFAR-100 from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 100
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=20, cardinality=32, bottleneck_width=2,
+                             model_name="resnext20_32x2d_cifar100", **kwargs)
+
+
+def resnext20_32x2d_svhn(num_classes=10, **kwargs):
+    """
+    ResNeXt-20 (32x2d) model for SVHN from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 10
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=20, cardinality=32, bottleneck_width=2,
+                             model_name="resnext20_32x2d_svhn", **kwargs)
+
+
+def resnext20_32x4d_cifar10(num_classes=10, **kwargs):
+    """
+    ResNeXt-20 (32x4d) model for CIFAR-10 from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 10
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=20, cardinality=32, bottleneck_width=4,
+                             model_name="resnext20_32x4d_cifar10", **kwargs)
+
+
+def resnext20_32x4d_cifar100(num_classes=100, **kwargs):
+    """
+    ResNeXt-20 (32x4d) model for CIFAR-100 from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 100
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=20, cardinality=32, bottleneck_width=4,
+                             model_name="resnext20_32x4d_cifar100", **kwargs)
+
+
+def resnext20_32x4d_svhn(num_classes=10, **kwargs):
+    """
+    ResNeXt-20 (32x4d) model for SVHN from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 10
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=20, cardinality=32, bottleneck_width=4,
+                             model_name="resnext20_32x4d_svhn", **kwargs)
 
 
 def resnext29_32x4d_cifar10(num_classes=10, **kwargs):
@@ -252,6 +419,114 @@ def resnext29_16x64d_svhn(num_classes=10, **kwargs):
                              model_name="resnext29_16x64d_svhn", **kwargs)
 
 
+def resnext272_1x64d_cifar10(num_classes=10, **kwargs):
+    """
+    ResNeXt-272 (1x64d) model for CIFAR-10 from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 10
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=272, cardinality=1, bottleneck_width=64,
+                             model_name="resnext272_1x64d_cifar10", **kwargs)
+
+
+def resnext272_1x64d_cifar100(num_classes=100, **kwargs):
+    """
+    ResNeXt-272 (1x64d) model for CIFAR-100 from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 100
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=272, cardinality=1, bottleneck_width=64,
+                             model_name="resnext272_1x64d_cifar100", **kwargs)
+
+
+def resnext272_1x64d_svhn(num_classes=10, **kwargs):
+    """
+    ResNeXt-272 (1x64d) model for SVHN from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 10
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=272, cardinality=1, bottleneck_width=64,
+                             model_name="resnext272_1x64d_svhn", **kwargs)
+
+
+def resnext272_2x32d_cifar10(num_classes=10, **kwargs):
+    """
+    ResNeXt-272 (2x32d) model for CIFAR-10 from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 10
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=272, cardinality=2, bottleneck_width=32,
+                             model_name="resnext272_2x32d_cifar10", **kwargs)
+
+
+def resnext272_2x32d_cifar100(num_classes=100, **kwargs):
+    """
+    ResNeXt-272 (2x32d) model for CIFAR-100 from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 100
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=272, cardinality=2, bottleneck_width=32,
+                             model_name="resnext272_2x32d_cifar100", **kwargs)
+
+
+def resnext272_2x32d_svhn(num_classes=10, **kwargs):
+    """
+    ResNeXt-272 (2x32d) model for SVHN from 'Aggregated Residual Transformations for Deep Neural Networks,'
+    http://arxiv.org/abs/1611.05431.
+
+    Parameters:
+    ----------
+    num_classes : int, default 10
+        Number of classification classes.
+    pretrained : bool, default False
+        Whether to load the pretrained weights for model.
+    root : str, default '~/.torch/models'
+        Location for keeping the model parameters.
+    """
+    return get_resnext_cifar(num_classes=num_classes, blocks=272, cardinality=2, bottleneck_width=32,
+                             model_name="resnext272_2x32d_svhn", **kwargs)
+
+
 def _calc_width(net):
     import numpy as np
     net_params = filter(lambda p: p.requires_grad, net.parameters())
@@ -263,17 +538,31 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
     models = [
+        (resnext20_16x4d_cifar10, 10),
+        (resnext20_16x4d_cifar100, 100),
+        (resnext20_16x4d_svhn, 10),
+        (resnext20_32x2d_cifar10, 10),
+        (resnext20_32x2d_cifar100, 100),
+        (resnext20_32x2d_svhn, 10),
+        (resnext20_32x4d_cifar10, 10),
+        (resnext20_32x4d_cifar100, 100),
+        (resnext20_32x4d_svhn, 10),
         (resnext29_32x4d_cifar10, 10),
         (resnext29_32x4d_cifar100, 100),
         (resnext29_32x4d_svhn, 10),
         (resnext29_16x64d_cifar10, 10),
         (resnext29_16x64d_cifar100, 100),
         (resnext29_16x64d_svhn, 10),
+        (resnext272_1x64d_cifar10, 10),
+        (resnext272_1x64d_cifar100, 100),
+        (resnext272_1x64d_svhn, 10),
+        (resnext272_2x32d_cifar10, 10),
+        (resnext272_2x32d_cifar100, 100),
+        (resnext272_2x32d_svhn, 10),
     ]
 
     for model, num_classes in models:
@@ -284,14 +573,29 @@ def _test():
         net.eval()
         weight_count = _calc_width(net)
         print("m={}, {}".format(model.__name__, weight_count))
+        assert (model != resnext20_16x4d_cifar10 or weight_count == 1995082)
+        assert (model != resnext20_16x4d_cifar100 or weight_count == 2087332)
+        assert (model != resnext20_16x4d_svhn or weight_count == 1995082)
+        assert (model != resnext20_32x2d_cifar10 or weight_count == 1946698)
+        assert (model != resnext20_32x2d_cifar100 or weight_count == 2038948)
+        assert (model != resnext20_32x2d_svhn or weight_count == 1946698)
+        assert (model != resnext20_32x4d_cifar10 or weight_count == 3295562)
+        assert (model != resnext20_32x4d_cifar100 or weight_count == 3387812)
+        assert (model != resnext20_32x4d_svhn or weight_count == 3295562)
         assert (model != resnext29_32x4d_cifar10 or weight_count == 4775754)
         assert (model != resnext29_32x4d_cifar100 or weight_count == 4868004)
         assert (model != resnext29_32x4d_svhn or weight_count == 4775754)
         assert (model != resnext29_16x64d_cifar10 or weight_count == 68155210)
         assert (model != resnext29_16x64d_cifar100 or weight_count == 68247460)
         assert (model != resnext29_16x64d_svhn or weight_count == 68155210)
+        assert (model != resnext272_1x64d_cifar10 or weight_count == 44540746)
+        assert (model != resnext272_1x64d_cifar100 or weight_count == 44632996)
+        assert (model != resnext272_1x64d_svhn or weight_count == 44540746)
+        assert (model != resnext272_2x32d_cifar10 or weight_count == 32928586)
+        assert (model != resnext272_2x32d_cifar100 or weight_count == 33020836)
+        assert (model != resnext272_2x32d_svhn or weight_count == 32928586)
 
-        x = Variable(torch.randn(1, 3, 32, 32))
+        x = torch.randn(1, 3, 32, 32)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, num_classes))

@@ -1,5 +1,5 @@
 """
-    CBAM-ResNet, implemented in Chainer.
+    CBAM-ResNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'CBAM: Convolutional Block Attention Module,' https://arxiv.org/abs/1807.06521.
 """
 
@@ -91,7 +91,7 @@ class SpatialGate(Chain):
             self.conv = conv7x7_block(
                 in_channels=2,
                 out_channels=1,
-                activate=False)
+                activation=None)
 
     def __call__(self, x):
         att1 = F.expand_dims(F.max(x, axis=1), axis=1)
@@ -170,7 +170,7 @@ class CbamResUnit(Chain):
                     in_channels=in_channels,
                     out_channels=out_channels,
                     stride=stride,
-                    activate=False)
+                    activation=None)
             self.cbam = CbamBlock(channels=out_channels)
             self.activ = F.relu
 
@@ -258,7 +258,7 @@ class CbamResNet(Chain):
 def get_resnet(blocks,
                model_name=None,
                pretrained=False,
-               root=os.path.join('~', '.chainer', 'models'),
+               root=os.path.join("~", ".chainer", "models"),
                **kwargs):
     """
     Create CBAM-ResNet model with specific parameters.

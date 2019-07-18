@@ -1,5 +1,5 @@
 """
-    PolyNet, implemented in Chainer.
+    PolyNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'PolyNet: A Pursuit of Structural Diversity in Very Deep Networks,'
     https://arxiv.org/abs/1611.05725.
 """
@@ -288,7 +288,7 @@ class TwoWayABlock(Chain):
                 self.conv = conv1x1_block(
                     in_channels=128,
                     out_channels=in_channels,
-                    activate=False)
+                    activation=None)
 
     def __call__(self, x):
         x = self.branches(x)
@@ -319,7 +319,7 @@ class TwoWayBBlock(Chain):
                 self.conv = conv1x1_block(
                     in_channels=384,
                     out_channels=in_channels,
-                    activate=False)
+                    activation=None)
 
     def __call__(self, x):
         x = self.branches(x)
@@ -350,7 +350,7 @@ class TwoWayCBlock(Chain):
                 self.conv = conv1x1_block(
                     in_channels=448,
                     out_channels=in_channels,
-                    activate=False)
+                    activation=None)
 
     def __call__(self, x):
         x = self.branches(x)
@@ -442,7 +442,7 @@ def poly_res_b_block():
         in_channels=384,
         out_channels=1152,
         stride=1,
-        activate=False)
+        activation=None)
 
 
 def poly_res_c_block():
@@ -453,7 +453,7 @@ def poly_res_c_block():
         in_channels=448,
         out_channels=2048,
         stride=1,
-        activate=False)
+        activation=None)
 
 
 class MultiResidual(Chain):
@@ -898,7 +898,7 @@ class PolyNet(Chain):
 
 def get_polynet(model_name=None,
                 pretrained=False,
-                root=os.path.join('~', '.chainer', 'models'),
+                root=os.path.join("~", ".chainer", "models"),
                 **kwargs):
     """
     Create PolyNet model with specific parameters.

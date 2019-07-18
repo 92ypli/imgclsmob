@@ -1,5 +1,5 @@
 """
-    AirNet, implemented in PyTorch.
+    AirNet for ImageNet-1K, implemented in PyTorch.
     Original paper: 'Attention Inspiring Receptive-Fields Network for Learning Invariant Representations,'
     https://ieeexplore.ieee.org/document/8510896.
 """
@@ -51,7 +51,7 @@ class AirBlock(nn.Module):
         self.conv3 = conv1x1_block(
             in_channels=mid_channels,
             out_channels=out_channels,
-            activate=False)
+            activation=None)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
@@ -102,7 +102,7 @@ class AirBottleneck(nn.Module):
         self.conv3 = conv1x1_block(
             in_channels=mid_channels,
             out_channels=out_channels,
-            activate=False)
+            activation=None)
         if self.use_air_block:
             self.air = AirBlock(
                 in_channels=in_channels,
@@ -153,7 +153,7 @@ class AirUnit(nn.Module):
                 in_channels=in_channels,
                 out_channels=out_channels,
                 stride=stride,
-                activate=False)
+                activation=None)
         self.activ = nn.ReLU(inplace=True)
 
     def forward(self, x):
@@ -283,7 +283,7 @@ def get_airnet(blocks,
                ratio,
                model_name=None,
                pretrained=False,
-               root=os.path.join('~', '.torch', 'models'),
+               root=os.path.join("~", ".torch", "models"),
                **kwargs):
     """
     Create AirNet model with specific parameters.
@@ -391,7 +391,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -413,7 +412,7 @@ def _test():
         assert (model != airnet50_1x64d_r16 or weight_count == 25714952)
         assert (model != airnet101_1x64d_r2 or weight_count == 51727432)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

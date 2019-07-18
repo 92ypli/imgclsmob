@@ -1,5 +1,5 @@
 """
-    DarkNet, implemented in Chainer.
+    DarkNet for ImageNet-1K, implemented in Chainer.
     Original source: 'Darknet: Open source neural networks in c,' https://github.com/pjreddie/darknet.
 """
 
@@ -132,7 +132,7 @@ class DarkNet(Chain):
 def get_darknet(version,
                 model_name=None,
                 pretrained=False,
-                root=os.path.join('~', '.chainer', 'models'),
+                root=os.path.join("~", ".chainer", "models"),
                 **kwargs):
     """
     Create DarkNet model with specific parameters.

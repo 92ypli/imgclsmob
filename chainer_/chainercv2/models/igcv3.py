@@ -1,5 +1,5 @@
 """
-    IGCV3, implemented in Chainer.
+    IGCV3 for ImageNet-1K, implemented in Chainer.
     Original paper: 'IGCV3: Interleaved Low-Rank Group Convolutions for Efficient Deep Neural Networks,'
     https://arxiv.org/abs/1806.00178.
 """
@@ -45,8 +45,7 @@ class InvResUnit(Chain):
                 in_channels=in_channels,
                 out_channels=mid_channels,
                 groups=groups,
-                activation=None,
-                activate=False)
+                activation=None)
             self.c_shuffle = ChannelShuffle(
                 channels=mid_channels,
                 groups=groups)
@@ -59,8 +58,7 @@ class InvResUnit(Chain):
                 in_channels=mid_channels,
                 out_channels=out_channels,
                 groups=groups,
-                activation=None,
-                activate=False)
+                activation=None)
 
     def __call__(self, x):
         if self.residual:
@@ -155,7 +153,7 @@ class IGCV3(Chain):
 def get_mobilenetv2(width_scale,
                     model_name=None,
                     pretrained=False,
-                    root=os.path.join('~', '.chainer', 'models'),
+                    root=os.path.join("~", ".chainer", "models"),
                     **kwargs):
     """
     Create IGCV3-D model with specific parameters.

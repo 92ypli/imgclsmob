@@ -1,5 +1,5 @@
 """
-    PeleeNet, implemented in Chainer.
+    PeleeNet for ImageNet-1K, implemented in Chainer.
     Original paper: 'Pelee: A Real-Time Object Detection System on Mobile Devices,' https://arxiv.org/abs/1804.06882.
 """
 
@@ -291,7 +291,7 @@ class PeleeNet(Chain):
 
 def get_peleenet(model_name=None,
                  pretrained=False,
-                 root=os.path.join('~', '.chainer', 'models'),
+                 root=os.path.join("~", ".chainer", "models"),
                  **kwargs):
     """
     Create PeleeNet model with specific parameters.

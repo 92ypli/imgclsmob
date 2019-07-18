@@ -1,5 +1,5 @@
 """
-    DarkNet-53, implemented in Keras.
+    DarkNet-53 for ImageNet-1K, implemented in Keras.
     Original source: 'YOLOv3: An Incremental Improvement,' https://arxiv.org/abs/1804.02767.
 """
 
@@ -85,7 +85,8 @@ def darknet53_model(channels,
     classes : int, default 1000
         Number of classification classes.
     """
-    input_shape = (in_channels, 224, 224) if is_channels_first() else (224, 224, in_channels)
+    input_shape = (in_channels, in_size[0], in_size[1]) if is_channels_first() else\
+        (in_size[0], in_size[1], in_channels)
     input = nn.Input(shape=input_shape)
 
     x = conv3x3_block(
@@ -137,7 +138,7 @@ def darknet53_model(channels,
 
 def get_darknet53(model_name=None,
                   pretrained=False,
-                  root=os.path.join('~', '.keras', 'models'),
+                  root=os.path.join("~", ".keras", "models"),
                   **kwargs):
     """
     Create DarkNet model with specific parameters.

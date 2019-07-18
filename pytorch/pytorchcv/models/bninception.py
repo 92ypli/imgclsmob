@@ -1,5 +1,5 @@
 """
-    BN-Inception, implemented in PyTorch.
+    BN-Inception for ImageNet-1K, implemented in PyTorch.
     Original paper: 'Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift,'
     https://arxiv.org/abs/1502.03167.
 """
@@ -357,7 +357,7 @@ class BNInception(nn.Module):
 
 def get_bninception(model_name=None,
                     pretrained=False,
-                    root=os.path.join('~', '.torch', 'models'),
+                    root=os.path.join("~", ".torch", "models"),
                     **kwargs):
     """
     Create BN-Inception model with specific parameters.
@@ -443,7 +443,6 @@ def _calc_width(net):
 
 def _test():
     import torch
-    from torch.autograd import Variable
 
     pretrained = False
 
@@ -461,7 +460,7 @@ def _test():
         print("m={}, {}".format(model.__name__, weight_count))
         assert (model != bninception or weight_count == 11295240)
 
-        x = Variable(torch.randn(1, 3, 224, 224))
+        x = torch.randn(1, 3, 224, 224)
         y = net(x)
         y.sum().backward()
         assert (tuple(y.size()) == (1, 1000))

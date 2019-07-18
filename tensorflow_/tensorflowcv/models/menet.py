@@ -1,5 +1,5 @@
 """
-    MENet, implemented in TensorFlow.
+    MENet for ImageNet-1K, implemented in TensorFlow.
     Original paper: 'Merging and Evolution: Improving Convolutional Neural Networks for Mobile Applications,'
     https://arxiv.org/abs/1803.09127.
 """
@@ -336,7 +336,7 @@ def get_menet(first_stage_channels,
               groups,
               model_name=None,
               pretrained=False,
-              root=os.path.join('~', '.tensorflow', 'models'),
+              root=os.path.join("~", ".tensorflow", "models"),
               **kwargs):
     """
     Create MENet model with specific parameters.

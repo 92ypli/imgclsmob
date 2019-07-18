@@ -1,5 +1,5 @@
 """
-    NASNet-A, implemented in Chainer.
+    NASNet-A for ImageNet-1K, implemented in Chainer.
     Original paper: 'Learning Transferable Architectures for Scalable Image Recognition,'
     https://arxiv.org/abs/1707.07012.
 """
@@ -1195,7 +1195,7 @@ def get_nasnet(repeat,
                in_size,
                model_name=None,
                pretrained=False,
-               root=os.path.join('~', '.chainer', 'models'),
+               root=os.path.join("~", ".chainer", "models"),
                **kwargs):
     """
     Create NASNet-A model with specific parameters.
